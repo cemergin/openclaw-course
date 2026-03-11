@@ -96,6 +96,10 @@ A working OpenClaw instance running 24/7 on AWS that you can message from WhatsA
 | Cloudflare (free plan) | $0 |
 | **Total** | **~$15-40** |
 
+## Built With
+
+This course was generated using [tech-skill-builder](https://github.com/cemergin/tech-skill-builder) — a Claude Code plugin that creates hands-on technical courses with progressive exercises, spiral progression, and adaptive tutoring. The plugin handles course design, content generation, and interactive learning sessions.
+
 ## License
 
 This course content is open source. Use it, share it, learn from it.
