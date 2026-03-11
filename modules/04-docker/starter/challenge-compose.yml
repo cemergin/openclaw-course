@@ -1,0 +1,43 @@
+# Docker Compose Challenge -- Module 4
+# Build a mini stack with SearXNG and a status page
+#
+# Your task: fill in the TODOs to create a working compose file.
+# Rename this file to docker-compose.yml when you're ready to use it.
+
+services:
+  searxng:
+    # TODO: Set the image to SearXNG's official Docker image
+    image:
+    container_name: challenge-searxng
+    restart: unless-stopped
+    ports:
+      # TODO: Map host port 8080 to container port 8080
+      # Remember: bind to 127.0.0.1 for security!
+      - ""
+    volumes:
+      # TODO: Mount a named volume to /etc/searxng (SearXNG's config directory)
+      -
+    networks:
+      - stack
+
+  status:
+    # TODO: Set the image (hint: you used this in the exercise)
+    image:
+    container_name: challenge-status
+    restart: unless-stopped
+    ports:
+      # TODO: Map host port 8081 to container port 80
+      # Remember: bind to 127.0.0.1!
+      - ""
+    volumes:
+      # TODO: Mount ./status-html to nginx's default HTML directory
+      # Hint: make it read-only with :ro
+      -
+    networks:
+      - stack
+
+networks:
+  stack:
+
+volumes:
+  # TODO: Declare the named volume you used for SearXNG's config

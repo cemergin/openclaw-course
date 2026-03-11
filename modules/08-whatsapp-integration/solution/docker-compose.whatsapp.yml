@@ -1,0 +1,68 @@
+# WhatsApp Integration -- Complete Docker Compose Snippet
+# This shows the WhatsApp-related additions merged into your compose file.
+#
+# Key decisions:
+# - Secrets are file-based (not environment variables) for security
+# - All five WhatsApp credentials are separate files
+# - The cloudflared tunnel handles HTTPS termination and routing
+
+services:
+  openclaw:
+    image: openclaw/openclaw:latest
+    container_name: openclaw
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"   # Only accessible locally (tunnel handles external access)
+    volumes:
+      - ./config:/app/config     # OpenClaw configuration
+      - openclaw-data:/app/data  # Persistent data (memory, etc.)
+    secrets:
+      # AI provider
+      - claude_api_key
+      # WhatsApp credentials
+      - whatsapp_access_token
+      - whatsapp_phone_number_id
+      - whatsapp_business_account_id
+      - whatsapp_app_secret
+      - whatsapp_verify_token
+    networks:
+      - internal
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN_FILE=/run/secrets/cloudflare_tunnel_token
+    secrets:
+      - cloudflare_tunnel_token
+    networks:
+      - internal
+    depends_on:
+      - openclaw
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  openclaw-data:
+
+# All secrets are file-based -- they mount at /run/secrets/<name> inside the container.
+# They never appear in `docker inspect`, environment variables, or logs.
+secrets:
+  claude_api_key:
+    file: ./secrets/claude_api_key
+  cloudflare_tunnel_token:
+    file: ./secrets/cloudflare_tunnel_token
+  whatsapp_access_token:
+    file: ./secrets/whatsapp_access_token
+  whatsapp_phone_number_id:
+    file: ./secrets/whatsapp_phone_number_id
+  whatsapp_business_account_id:
+    file: ./secrets/whatsapp_business_account_id
+  whatsapp_app_secret:
+    file: ./secrets/whatsapp_app_secret
+  whatsapp_verify_token:
+    file: ./secrets/whatsapp_verify_token

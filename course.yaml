@@ -1,0 +1,389 @@
+title: "Deploy Your AI Agent — OpenClaw on the Cloud"
+slug: openclaw-cloud-deploy
+version: "1.0"
+
+spiral_loops:
+  - name: "Foundation"
+    description: "Core concepts, first deployment, basic security awareness"
+    modules: [0, 1, 2, 3, 4, 5]
+  - name: "Production"
+    description: "Real integrations, proper secrets, hardening, tunnels"
+    modules: [6, 7, 8, 9]
+  - name: "Mastery"
+    description: "Monitoring, kill switches, bonus integrations, independence"
+    modules: [10, 11, 12]
+
+modules:
+
+  # ═══════════════════════════════════════════════════════════════
+  # MODULE 0 — SPEED RUN (standalone evening track)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: "00-speed-run"
+    title: "Speed Run — Your Bot Tonight"
+    subtitle: "Get OpenClaw running with Telegram in one evening"
+    loop: foundation
+    tier: intro
+    estimated_time: "2-3 hours"
+    description: |
+      The fast track. You'll spin up a cheap VPS, install OpenClaw, connect
+      Telegram, and have a working AI agent you can message from your phone —
+      all before bedtime. Security is minimal (we'll fix that in the full course).
+      This is about the dopamine hit of "holy crap, it works."
+    objectives:
+      - Create an AWS Lightsail instance
+      - SSH into a remote server for the first time
+      - Install OpenClaw using the quick-install method
+      - Create a Telegram bot and connect it to OpenClaw
+      - Send your first message and get a response
+    concepts:
+      - What OpenClaw is and how it works (30-second version)
+      - VPS = a computer in the cloud that's always on
+      - SSH = remote control for that computer
+      - API keys = passwords for AI services
+      - Telegram bots = the easiest chat integration
+    note: |
+      This module is self-contained. If you just want a working bot tonight,
+      start and end here. The rest of the course teaches you to do it RIGHT —
+      secured, monitored, and production-ready with WhatsApp.
+
+  # ═══════════════════════════════════════════════════════════════
+  # LOOP 1: FOUNDATION
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: "01-ai-agents"
+    title: "What Are AI Agents (And Why Run Your Own)?"
+    subtitle: "From chatbots to autonomous agents — and why self-hosting matters"
+    loop: foundation
+    tier: conceptual
+    estimated_time: "45 min"
+    description: |
+      Before we touch a server, let's understand what we're building. What makes
+      an AI agent different from ChatGPT? Why would you run one on your own
+      hardware instead of using a hosted service? What's OpenClaw specifically,
+      and how does its architecture work? This module builds the mental model
+      that makes every later decision make sense.
+    objectives:
+      - Explain the difference between a chatbot, an AI assistant, and an AI agent
+      - Describe OpenClaw's architecture (you → chat app → VPS → AI APIs)
+      - Understand why self-hosting gives you control, privacy, and flexibility
+      - Know what API keys are and how AI billing works (pay-per-use)
+      - Get your Claude and/or OpenAI API keys ready
+    concepts:
+      - AI agents vs chatbots vs assistants
+      - The OpenClaw architecture diagram
+      - API keys and pay-per-use AI billing
+      - Self-hosting tradeoffs (control vs responsibility)
+      - Claude vs OpenAI — what to pick and why
+
+  - id: "02-cloud-vps"
+    title: "Your Computer in the Sky"
+    subtitle: "Provisioning a VPS on AWS Lightsail"
+    loop: foundation
+    tier: hands-on
+    estimated_time: "1 hour"
+    description: |
+      Time to get a server. You'll create an AWS account, spin up a Lightsail
+      instance, and understand what you just rented. We'll cover what a VPS
+      actually is, why Lightsail is the right choice for this project, and
+      what the alternatives look like. By the end, you'll have a running
+      Ubuntu server with a static IP address.
+    objectives:
+      - Create an AWS account and navigate to Lightsail
+      - Choose the right instance size for OpenClaw
+      - Launch an Ubuntu 22.04 instance
+      - Attach a static IP address
+      - Understand what you're paying for and how to not get surprise-billed
+    concepts:
+      - What a VPS is (virtual private server — your rented computer)
+      - Cloud providers landscape (AWS, Hetzner, DigitalOcean, Vultr)
+      - Why Lightsail specifically (simple, predictable pricing, good enough)
+      - Instance sizing (CPU, RAM, storage, bandwidth)
+      - Static vs dynamic IPs
+
+  - id: "03-ssh-linux"
+    title: "Remote Control — SSH and Linux Basics"
+    subtitle: "Connecting to your server and finding your way around"
+    loop: foundation
+    tier: hands-on
+    estimated_time: "1.5 hours"
+    description: |
+      Your server is running but you can't touch it — it's in a data center
+      somewhere. SSH is how you control it remotely. This module teaches you
+      to connect securely, navigate the filesystem, manage users, and run
+      the commands you'll need for the rest of the course. If you've never
+      administered a Linux server, this is your crash course.
+    objectives:
+      - Generate SSH keys and connect to your VPS
+      - Navigate the Linux filesystem (paths, permissions, ownership)
+      - Create a dedicated non-root user for OpenClaw
+      - Install packages with apt
+      - Use systemctl to manage services
+      - Edit files with nano (or vim if you're brave)
+    concepts:
+      - SSH key pairs (public/private) — why passwords are bad
+      - The Linux filesystem layout (/home, /etc, /var, /root)
+      - Users and permissions (root vs regular users, chmod, chown)
+      - Package management (apt update, apt install)
+      - Services and systemd (start, stop, enable, status)
+      - Why you never run things as root
+
+  - id: "04-docker"
+    title: "Containers — Your Apps in Boxes"
+    subtitle: "Docker and Docker Compose for humans"
+    loop: foundation
+    tier: hands-on
+    estimated_time: "1.5 hours"
+    description: |
+      Instead of installing OpenClaw directly on your server (messy, hard to
+      update, conflicts with other software), we'll run everything in containers.
+      Docker is like shipping containers for software — standardized boxes that
+      work the same everywhere. This module gets Docker installed and teaches
+      you enough to run, manage, and debug containerized applications.
+    objectives:
+      - Explain what containers are and why they beat bare-metal installs
+      - Install Docker and Docker Compose on your VPS
+      - Run your first container (hello-world, then something useful)
+      - Understand Docker Compose files (services, volumes, networks, ports)
+      - Read container logs and debug issues
+      - Know the essential Docker commands for daily operations
+    concepts:
+      - Containers vs VMs vs bare metal
+      - Docker images (blueprints) vs containers (running instances)
+      - Docker Compose (orchestrating multiple containers)
+      - Volumes (persistent data that survives container restarts)
+      - Networks (how containers talk to each other)
+      - Port mapping (localhost:3000 → container:3000)
+
+  - id: "05-security-fundamentals"
+    title: "The Lethal Trifecta (And How Not to Die)"
+    subtitle: "Security fundamentals for anyone running a server"
+    loop: foundation
+    tier: conceptual-hands-on
+    estimated_time: "1.5 hours"
+    description: |
+      This is the module you'll bookmark and come back to. Before we deploy
+      anything real, you need to understand the three things that get servers
+      owned: open ports, exposed secrets, and no monitoring. We call it the
+      "lethal trifecta" — have all three and it's not a question of IF you
+      get hacked, but WHEN. This module builds your security mental model
+      and gives you the checklist you'll apply to everything that follows.
+    objectives:
+      - Identify the "lethal trifecta" and explain why each component is dangerous
+      - Configure UFW firewall to block all unnecessary inbound traffic
+      - Understand attack surfaces (what hackers look for in exposed servers)
+      - Know the difference between security theater and actual security
+      - Apply the principle of least privilege to every decision
+      - Set up automatic OS security updates
+    concepts:
+      - The lethal trifecta — open ports + exposed secrets + no monitoring
+      - Attack surface — every open port is a door, every exposed secret is a key
+      - Defense in depth — multiple layers, no single point of failure
+      - Principle of least privilege — minimum access for minimum risk
+      - UFW firewall basics (deny all, allow specific)
+      - Automatic security updates (unattended-upgrades)
+      - Webhook signature verification — proving messages are from who they claim
+      - Prompt injection via email/messages — the AI-specific attack vector
+      - Security checklists as a practice, not a one-time thing
+
+  # ═══════════════════════════════════════════════════════════════
+  # LOOP 2: PRODUCTION
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: "06-secrets"
+    title: "Secrets Management — Not Just a .env File"
+    subtitle: "Storing API keys and tokens properly"
+    loop: production
+    tier: hands-on
+    estimated_time: "1.5 hours"
+    description: |
+      You've got API keys for Claude, WhatsApp, GitHub, Notion — where do
+      they go? If you said ".env file" you're in good company, but that's
+      the exposed-secrets leg of the lethal trifecta. This module teaches
+      three approaches to secrets management, from simple-and-good-enough
+      to encrypted-in-git, and you'll implement the recommended one.
+    objectives:
+      - Explain why .env files are risky (docker inspect, logs, child processes)
+      - Implement Docker file-based secrets (the recommended approach)
+      - Understand SOPS + age for encrypted-at-rest secrets (optional advanced path)
+      - Know when to use a password manager CLI (Bitwarden/1Password)
+      - Separate secrets from non-secret configuration
+      - Set correct file permissions (chmod 600) on everything sensitive
+    concepts:
+      - Why environment variables leak (docker inspect, /proc, logs)
+      - Docker Secrets (file-based, mounted at /run/secrets/)
+      - SOPS + age encryption (secrets safe in git)
+      - Password manager CLI integration
+      - Secret vs config — what actually needs protection
+      - File permissions and why 600 matters
+      - The entrypoint-wrapper pattern (files → env vars at startup)
+
+  - id: "07-cloudflare-tunnel"
+    title: "Zero Open Ports — Cloudflare Tunnel"
+    subtitle: "Exposing services without exposing your server"
+    loop: production
+    tier: hands-on
+    estimated_time: "1.5 hours"
+    description: |
+      Here's the magic trick: your VPS has NO open ports (except SSH for you),
+      yet WhatsApp can still deliver messages to it. How? Cloudflare Tunnel
+      creates an outbound connection from your server to Cloudflare's network.
+      Traffic flows through the tunnel — your server is invisible to the internet.
+      This is the single biggest security win in the entire setup.
+    objectives:
+      - Explain how Cloudflare Tunnel works (outbound connection, no inbound ports)
+      - Set up a Cloudflare account and add a domain
+      - Create and configure a tunnel via the Cloudflare dashboard
+      - Route multiple subdomains through the tunnel (openclaw, status, killswitch)
+      - Run cloudflared as a Docker container
+      - Verify the tunnel is working and your server has zero open inbound ports
+    concepts:
+      - Traditional webhooks (open port 443) vs tunnel (outbound only)
+      - How Cloudflare Tunnel works under the hood
+      - DNS routing (subdomain → tunnel → local service)
+      - The tunnel token method (easier than config files for Docker)
+      - Why zero open ports is a game-changer for security
+      - Catch-all rules (404 for anything unexpected)
+
+  - id: "08-whatsapp-integration"
+    title: "WhatsApp — The Real Integration"
+    subtitle: "Meta Business API, webhooks, and making it all talk"
+    loop: production
+    tier: hands-on
+    estimated_time: "2 hours"
+    description: |
+      Telegram was easy — WhatsApp is where the real learning happens. You'll
+      set up a Meta Business account, configure webhooks that route through
+      your Cloudflare Tunnel, handle signature verification, and understand
+      the full message flow from your phone to OpenClaw and back. This is
+      also where security concepts from Module 5 become real.
+    objectives:
+      - Create a Meta developer account and WhatsApp Business app
+      - Configure webhooks pointing to your Cloudflare Tunnel URL
+      - Understand the message flow (phone → Meta → tunnel → OpenClaw → reply)
+      - Set up webhook signature verification (X-Hub-Signature-256)
+      - Test with the Meta test phone number
+      - Configure the phone number allowlist (only your number gets through)
+    concepts:
+      - Meta Business Platform and WhatsApp Business API
+      - Webhooks — what they are and how they work
+      - HMAC-SHA256 signature verification (proving Meta sent the message)
+      - The full message lifecycle (send → receive → process → reply)
+      - Allowlisting (only trusted phone numbers get through)
+      - Test vs production (5 numbers vs unlimited)
+
+  - id: "09-deploy-openclaw"
+    title: "Ship It — Full Docker Compose Deployment"
+    subtitle: "Bringing everything together into one docker-compose.yml"
+    loop: production
+    tier: hands-on
+    estimated_time: "2 hours"
+    description: |
+      Everything you've built — VPS, Docker, secrets, tunnel, WhatsApp — comes
+      together in a single docker-compose.yml. This module walks through the
+      complete compose file, explains every service and how they connect, and
+      gets your full stack running. By the end, you'll message your WhatsApp
+      bot and get a response from Claude.
+    objectives:
+      - Build the complete docker-compose.yml with all services
+      - Configure OpenClaw, Cloudflared, SearXNG, and Uptime Kuma as containers
+      - Wire up secrets, volumes, networks, and health checks
+      - Run the full stack with docker compose up -d
+      - Complete OpenClaw onboarding (openclaw onboard)
+      - Send your first WhatsApp message and get a Claude-powered response
+      - Know the daily operations commands (start, stop, restart, logs, update)
+    concepts:
+      - Multi-service Docker Compose architecture
+      - Service dependencies (depends_on, health checks)
+      - Internal Docker networks (containers talk by service name)
+      - Volume management (config, data, repos)
+      - The onboarding flow
+      - Container lifecycle management
+
+  # ═══════════════════════════════════════════════════════════════
+  # LOOP 3: MASTERY
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: "10-monitoring"
+    title: "Is It Still Alive? — Monitoring and Alerts"
+    subtitle: "Know when things break before your bot goes silent"
+    loop: mastery
+    tier: hands-on
+    estimated_time: "1 hour"
+    description: |
+      The third leg of the lethal trifecta is "no monitoring." Your bot could
+      crash at 3am and you wouldn't know until you try to use it tomorrow.
+      This module sets up monitoring — from a simple health check script to
+      Uptime Kuma with push notifications. You'll know within 60 seconds
+      if anything goes wrong.
+    objectives:
+      - Write a health check script that monitors CPU, RAM, disk, and service status
+      - Set up cron jobs to run health checks every 5 minutes
+      - Configure Uptime Kuma for web-based monitoring with alerts
+      - Set up push notifications (Telegram, email, or Discord) for outages
+      - Optionally integrate Healthchecks.io as an external dead-man's switch
+      - Read and interpret docker stats output
+    concepts:
+      - Why monitoring completes the security trifecta
+      - Health checks (active polling vs passive dead-man's switch)
+      - Cron jobs (scheduled tasks on Linux)
+      - Uptime Kuma (self-hosted monitoring)
+      - Alert fatigue — monitoring the right things, not everything
+      - Resource monitoring (CPU, RAM, disk, network)
+
+  - id: "11-kill-switch"
+    title: "The Kill Switch — Emergency Stop from Your Phone"
+    subtitle: "Four ways to shut it down when things go sideways"
+    loop: mastery
+    tier: hands-on
+    estimated_time: "1 hour"
+    description: |
+      If your AI agent starts burning through API credits, acting on prompt-
+      injected emails, or behaving weirdly — you need to shut it down NOW,
+      from your phone, without SSH. This module builds a kill switch with
+      four escalation levels, from a bookmarked URL to the nuclear option
+      of powering off the VPS from your provider's mobile app.
+    objectives:
+      - Build a secret URL kill endpoint routed through Cloudflare Tunnel
+      - Bookmark the kill URL on your phone and test it
+      - Set up the WhatsApp kill phrase (pre-AI string match)
+      - Know the SSH one-liner for quick stops
+      - Install your VPS provider's mobile app as the nuclear option
+      - Test the full kill + revive cycle
+      - Memorize the escalation playbook
+    concepts:
+      - Why AI agents need kill switches (runaway costs, prompt injection)
+      - Defense in depth applied to shutdown (4 escalation levels)
+      - Docker socket access (how the kill container stops OpenClaw)
+      - The escalation playbook (URL → WhatsApp → SSH → provider app)
+      - Reviving after a kill (which containers stay alive, which restart)
+
+  - id: "12-bonus-integrations"
+    title: "Power Ups — GitHub, Gmail, Notion, and More"
+    subtitle: "Connecting your AI agent to the rest of your digital life"
+    loop: mastery
+    tier: hands-on
+    estimated_time: "2-3 hours"
+    description: |
+      Your bot works. Now let's make it useful. This module covers the bonus
+      integrations that turn OpenClaw from a chat-based AI into a personal
+      assistant that can push code to GitHub, read your newsletters, manage
+      your Notion tasks, search the web for you on bad connections, and
+      store files in Google Drive. Each integration is independent — pick
+      the ones you want.
+    objectives:
+      - Set up GitHub with fine-grained tokens (read-only + read-write)
+      - Configure Gmail with OAuth2 and a dedicated account (security-first)
+      - Connect Notion for task capture and note-taking from WhatsApp
+      - Add Google Drive for file storage and retrieval
+      - Set up web search (SearXNG self-hosted or Tavily API)
+      - Apply security principles to each integration (least privilege, scoping)
+    concepts:
+      - Fine-grained GitHub tokens (scoped to specific repos + permissions)
+      - OAuth2 flow (Google APIs — Gmail, Drive, Calendar)
+      - Prompt injection via email (the biggest AI-specific risk)
+      - Gmail filters as a security layer
+      - Notion API integration tokens (explicit page sharing)
+      - SearXNG (self-hosted private search) vs Tavily (API-based)
+      - The "dedicated account" pattern (isolate AI access from personal data)
+      - Token rotation and expiration as a habit

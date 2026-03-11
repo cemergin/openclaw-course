@@ -1,0 +1,41 @@
+# SSH Config -- OpenClaw VPS
+# ==========================
+#
+# This is a complete, working SSH config for connecting to your OpenClaw VPS.
+# Place this at ~/.ssh/config on your local machine.
+#
+# Usage: ssh openclaw
+#
+
+Host openclaw
+    # Your VPS static IP (replace with your actual IP)
+    HostName 123.45.67.89
+
+    # The default Lightsail user
+    User ubuntu
+
+    # Path to the private key generated in Exercise Step 1
+    IdentityFile ~/.ssh/openclaw
+
+    # Non-default port (if you completed Challenge Task 3)
+    # Change to 22 if you kept the default port
+    Port 41022
+
+    # Keepalive settings -- prevents idle disconnections
+    # Sends a null packet every 60 seconds
+    # Gives up after 3 missed responses (3 minutes of no response)
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+
+# ─────────────────────────────────────────────────────
+# NOTES:
+#
+# You can add more hosts to this file later. For example, if you
+# set up a second server or want a shortcut for GitHub:
+#
+# Host github.com
+#     IdentityFile ~/.ssh/github_key
+#
+# Each "Host" block is independent. SSH reads the config top to
+# bottom and uses the first matching Host entry.
+# ─────────────────────────────────────────────────────

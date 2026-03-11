@@ -1,0 +1,12 @@
+# WhatsApp Configuration for OpenClaw -- Complete
+#
+# This shows the allowlist configured and block_unknown enabled.
+# In production, only numbers on this list will get responses.
+# Everyone else is silently ignored (no error response -- silence reveals nothing).
+
+whatsapp:
+  enabled: true
+  allowed_numbers:
+    - "+905551234567"    # Primary phone number
+    # - "+905559876543"  # Uncomment to add a second trusted number
+  block_unknown: true    # Silently ignore messages from unlisted numbers

@@ -1,0 +1,26 @@
+# Cloudflare Tunnel service for Docker Compose
+# Add this service block to your existing docker-compose.yml
+#
+# This container runs the cloudflared tunnel client, which creates
+# an outbound-only connection to Cloudflare's network. No inbound
+# ports required.
+
+services:
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    # TODO: Set the command to run the tunnel.
+    # Hint: cloudflared needs the "tunnel run" command.
+    command: # <-- fill this in
+    environment:
+      # TODO: Add your tunnel token from the Cloudflare dashboard.
+      # You created this in Step 3 of the exercise.
+      # It starts with "eyJ" and is a long base64 string.
+      - TUNNEL_TOKEN=  # <-- paste your token here
+    networks:
+      # TODO: Make sure cloudflared is on the same Docker network
+      # as your other services. It needs to reach them by container
+      # name (e.g., "openclaw:3000", "uptime-kuma:3001").
+      - # <-- which network?

@@ -1,0 +1,14 @@
+# SearXNG Configuration
+# Copy this file to config/searxng/settings.yml
+#
+# This is a minimal config that enables JSON output (required for OpenClaw)
+# and sets a secret key for session management.
+
+use_default_settings: true
+server:
+  # TODO: Replace with a random string. Generate one with: openssl rand -hex 16
+  secret_key: "REPLACE-ME-WITH-RANDOM-STRING"
+  bind_address: "0.0.0.0"
+search:
+  # JSON format is required for OpenClaw to query SearXNG programmatically
+  formats: [html, json]
