@@ -1,4 +1,4 @@
-# Episode 11: The Kill Switch -- Emergency Stop from Your Phone
+# Episode 12: The Kill Switch -- Emergency Stop from Your Phone
 
 ## Four Ways to Shut It Down When Things Go Sideways
 
@@ -28,8 +28,8 @@ You should have completed Modules 9 and 10. Your full OpenClaw stack should be r
 - **Module 7: Cloudflare Tunnel** -- routing a new subdomain/path through your existing tunnel
 - **Module 8: WhatsApp Integration** -- the message processing pipeline where the kill phrase intercepts
 - **Module 9: Ship It** -- the full stack you're about to learn to stop and restart
-- **Module 10: Monitoring** -- Uptime Kuma will detect every kill you trigger (that's how you verify it worked)
+- **Module 11: Monitoring** -- Uptime Kuma will detect every kill you trigger (that's how you verify it worked)
 
 ### What's Next
 
-In **Module 12: Power Ups -- GitHub, Gmail, Notion, and More**, you'll connect your (now safely kill-switchable) AI agent to the rest of your digital life. More integrations means more reasons to have a kill switch -- good thing you just built one.
+In **Module 13: Power Ups -- GitHub, Gmail, Notion, and More**, you'll connect your (now safely kill-switchable) AI agent to the rest of your digital life. More integrations means more reasons to have a kill switch -- good thing you just built one.

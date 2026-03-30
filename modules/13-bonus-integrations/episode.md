@@ -1,4 +1,4 @@
-# Episode 12: Power Ups -- GitHub, Gmail, Notion, and More
+# Episode 13: Power Ups -- GitHub, Gmail, Notion, and More
 
 ## Connecting Your AI Agent to the Rest of Your Digital Life
 
@@ -18,7 +18,7 @@ Your OpenClaw bot is deployed, secured, monitored, and has a kill switch. It wor
 
 ### Prerequisites
 
-You should have a fully deployed OpenClaw stack (Modules 6-9), with monitoring (Module 10) and a kill switch (Module 11) in place. You should be comfortable with Docker secrets and the principle of least privilege.
+You should have a fully deployed OpenClaw stack (Modules 6-9), with monitoring (Module 11) and a kill switch (Module 12) in place. You should be comfortable with Docker secrets and the principle of least privilege.
 
 > **Self-check:** Can you message your WhatsApp bot and get a response? Can you explain why we use Docker file-based secrets instead of .env files? You're ready.
 
@@ -27,7 +27,7 @@ You should have a fully deployed OpenClaw stack (Modules 6-9), with monitoring (
 - **Module 6: Secrets Management** -- you'll store every new token as a Docker secret, not in .env
 - **Module 5: The Lethal Trifecta** -- least privilege, scoped access, and security-first thinking guide every integration
 - **Module 9: Full Docker Compose Deployment** -- you'll add new secrets and environment variables to your running stack
-- **Module 11: The Kill Switch** -- if an integration misbehaves, you know how to shut things down fast
+- **Module 12: The Kill Switch** -- if an integration misbehaves, you know how to shut things down fast
 
 ### What's Next
 

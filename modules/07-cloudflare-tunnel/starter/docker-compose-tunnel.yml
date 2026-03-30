@@ -1,0 +1,11 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel run --token YOUR_TUNNEL_TOKEN_HERE
+    networks:
+      - openclaw-net
+
+networks:
+  openclaw-net:

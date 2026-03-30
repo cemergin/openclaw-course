@@ -1,4 +1,4 @@
-# Episode 10: Is It Still Alive? -- Monitoring and Alerts
+# Episode 11: Is It Still Alive? -- Monitoring and Alerts
 
 ## Know When Things Break Before Your Bot Goes Silent
 
@@ -30,4 +30,4 @@ You should have completed Module 9 and have a fully running OpenClaw stack (Open
 
 ### What's Next
 
-In **Module 11: The Kill Switch**, you'll build an emergency stop that works from your phone. Monitoring tells you something is wrong -- the kill switch lets you *do* something about it instantly, without needing to SSH in. Together, they form your incident response: detect fast, act faster.
+In **Module 12: The Kill Switch**, you'll build an emergency stop that works from your phone. Monitoring tells you something is wrong -- the kill switch lets you *do* something about it instantly, without needing to SSH in. Together, they form your incident response: detect fast, act faster.

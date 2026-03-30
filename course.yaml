@@ -8,10 +8,10 @@ spiral_loops:
     modules: [0, 1, 2, 3, 4, 5]
   - name: "Production"
     description: "Real integrations, proper secrets, hardening, tunnels"
-    modules: [6, 7, 8, 9]
+    modules: [6, 7, 8, 9, 10]
   - name: "Mastery"
     description: "Monitoring, kill switches, bonus integrations, independence"
-    modules: [10, 11, 12]
+    modules: [11, 12, 13]
 
 modules:
 
@@ -300,11 +300,40 @@ modules:
       - The onboarding flow
       - Container lifecycle management
 
+  - id: "10-git-deploy"
+    title: "Git Push to Deploy"
+    subtitle: "No more nano on the server — version-controlled infrastructure"
+    loop: production
+    tier: hands-on
+    estimated_time: "1.5 hours"
+    description: |
+      You've been SSH-ing into your server and hand-editing files with nano.
+      That worked for learning, but it's error-prone, not repeatable, and not
+      auditable. Time to fix that. You'll set up a private GitHub repo for your
+      configuration files, create a deploy script, and never nano a compose
+      file on the server again. Push to GitHub, pull on the server, done.
+      This also gives you disaster recovery — if your server dies, you can
+      rebuild from the repo in 30 minutes instead of starting from scratch.
+    objectives:
+      - Create a private GitHub repo for OpenClaw configuration
+      - Set up .gitignore as a security boundary (secrets never in git)
+      - Generate a fine-grained GitHub token (read-only, one repo, 90-day expiry)
+      - Create secret example files as documentation
+      - Build a deploy script for repeatable deployments
+      - Test the full workflow (local edit → git push → deploy on server)
+    concepts:
+      - Infrastructure as Code (config in git, secrets on server)
+      - .gitignore as a security boundary
+      - Fine-grained GitHub tokens (least privilege for deployment)
+      - Secret example files (documentation without values)
+      - Deploy scripts (repeatable, auditable)
+      - Disaster recovery (clone repo + recreate secrets = back in business)
+
   # ═══════════════════════════════════════════════════════════════
   # LOOP 3: MASTERY
   # ═══════════════════════════════════════════════════════════════
 
-  - id: "10-monitoring"
+  - id: "11-monitoring"
     title: "Is It Still Alive? — Monitoring and Alerts"
     subtitle: "Know when things break before your bot goes silent"
     loop: mastery
@@ -331,7 +360,7 @@ modules:
       - Alert fatigue — monitoring the right things, not everything
       - Resource monitoring (CPU, RAM, disk, network)
 
-  - id: "11-kill-switch"
+  - id: "12-kill-switch"
     title: "The Kill Switch — Emergency Stop from Your Phone"
     subtitle: "Four ways to shut it down when things go sideways"
     loop: mastery
@@ -358,7 +387,7 @@ modules:
       - The escalation playbook (URL → WhatsApp → SSH → provider app)
       - Reviving after a kill (which containers stay alive, which restart)
 
-  - id: "12-bonus-integrations"
+  - id: "13-bonus-integrations"
     title: "Power Ups — GitHub, Gmail, Notion, and More"
     subtitle: "Connecting your AI agent to the rest of your digital life"
     loop: mastery
