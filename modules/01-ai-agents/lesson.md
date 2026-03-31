@@ -51,7 +51,7 @@ That's what OpenClaw is.
 
 ## So What Is OpenClaw, Exactly?
 
-OpenClaw is an open-source personal AI agent. It runs on a server you control, connects to your chat apps, and uses AI APIs (like Claude or GPT) as its "brain." Think of it as the middleware layer that turns a chat message from your phone into an intelligent action.
+OpenClaw is an open-source personal AI agent. It runs on hardware you control (your laptop for now, a cloud server later), connects to your chat apps, and uses AI APIs (like Claude or GPT) as its "brain." Think of it as the middleware layer that turns a chat message from your phone into an intelligent action.
 
 Here's the architecture, and it's worth staring at for a moment:
 
@@ -59,10 +59,13 @@ Here's the architecture, and it's worth staring at for a moment:
 You (phone or laptop)
   |
   v
-Chat App (WhatsApp, Telegram, Discord, etc.)
+Chat App (Telegram, Discord, Slack, etc.)
   |
   v
-OpenClaw (running 24/7 on your VPS)
+Docker Container
+  |
+  v
+OpenClaw (running in the container)
   |
   +---> Claude API / OpenAI API (the AI brain)
   +---> Gmail (read/send emails)
@@ -75,17 +78,19 @@ OpenClaw (running 24/7 on your VPS)
 
 Let's break down each layer:
 
-**You** -- sitting on your couch, on the bus, wherever. You send a WhatsApp message like "summarize my unread emails" or "what did we talk about last Tuesday?"
+**You** -- sitting on your couch, on the bus, wherever. You send a Telegram message like "summarize my unread emails" or "what did we talk about last Tuesday?"
 
-**Chat App** -- WhatsApp, Telegram, Discord -- whatever you already use. This is just the interface. You're not learning a new app; your AI agent lives where you already are.
+**Chat App** -- Telegram, Discord, Slack -- whatever you already use. This is just the interface. You're not learning a new app; your AI agent lives where you already are.
 
-**OpenClaw on your VPS** -- this is the engine. It receives your message, figures out what you're asking, calls the right AI model, executes any needed actions (check email, search the web, look up your conversation history), and sends back a response. It runs 24/7, even when your laptop is off.
+**Docker Container** -- this is the box that holds everything. Docker gives us isolation (OpenClaw can't mess up your system), portability (the same container runs on your laptop and a cloud server), and reproducibility (same setup every time). Think of it as a lightweight virtual machine.
+
+**OpenClaw** -- this is the engine. It receives your message, figures out what you're asking, calls the right AI model, executes any needed actions (check email, search the web, look up your conversation history), and sends back a response.
 
 **AI APIs** -- OpenClaw doesn't contain its own AI model. It calls Claude or GPT (or both) through their APIs. You bring your own API key and pay per use. This is actually a feature, not a limitation -- it means you can switch models whenever a better one comes out.
 
-**Integrations** -- the real power. OpenClaw can connect to dozens of services. Your agent isn't just a chatbot sitting in WhatsApp -- it's your personal digital assistant with its hands on the controls.
+**Integrations** -- the real power. OpenClaw can connect to dozens of services. Your agent isn't just a chatbot sitting in Telegram -- it's your personal digital assistant with its hands on the controls.
 
-> **Pro tip:** You might be wondering, "Wait, so my messages go through WhatsApp's servers to reach my own server?" Yes. That's how webhooks work, and we'll secure this chain properly in later modules. For now, just understand the flow.
+> **Pro tip:** You might be wondering, "Wait, so my messages go through Telegram's servers to reach my container?" Yes. That's how it works. For now (locally), OpenClaw uses long polling to fetch messages. Later (on a server), we can use webhooks through a Cloudflare Tunnel for zero open ports. The full architecture is covered in Modules 6-8.
 
 ---
 
@@ -95,7 +100,7 @@ You could use ChatGPT's app. You could pay for Claude Pro. These are fine produc
 
 ### 1. You Control Your Data
 
-When you use ChatGPT or Claude through their web apps, your conversations live on their servers, under their terms of service. When you self-host, your conversation history, your files, your emails -- all of it lives on *your* server. You decide what gets stored, for how long, and who can access it.
+When you use ChatGPT or Claude through their web apps, your conversations live on their servers, under their terms of service. When you self-host, your conversation history, your files, your emails -- all of it lives on *your* machine (or your server). You decide what gets stored, for how long, and who can access it.
 
 This isn't paranoia. It's the same reason people run their own email servers or use self-hosted password managers. Ownership matters.
 
@@ -109,19 +114,21 @@ Hosted AI assistants give you whatever integrations they decided to build. OpenC
 
 ### 4. It's Always On
 
-This is the underrated one. Your AI agent runs 24/7 on a server. You message it from WhatsApp at 3am and it responds. Your laptop can be off, your phone can be on airplane mode -- as long as the VPS is running and you have *some* way to reach your chat app, your agent is available.
+This is the underrated one. Your AI agent runs 24/7 on a server. You message it from Telegram at 3am and it responds. Your laptop can be off, your phone can be on airplane mode -- as long as the server is running and you have *some* way to reach your chat app, your agent is available.
+
+(Right now, if you did the Speed Run, your bot only works when your laptop is open. The full course fixes that -- Modules 4-6 get it on a server.)
 
 ### 5. It's Surprisingly Cheap
 
-A VPS costs $3.50-5 per month. API usage for personal use typically runs $5-15 per month depending on how chatty you are. That's roughly the price of a single ChatGPT Plus subscription, but with way more flexibility.
+A VPS costs $5-20 per month. API usage for personal use typically runs $5-15 per month depending on how chatty you are. That's roughly the price of a single ChatGPT Plus subscription, but with way more flexibility.
 
 ### The Tradeoff (Let's Be Honest)
 
 Self-hosting isn't free lunch. You're taking on responsibility:
 
-- **You maintain the server.** If it goes down at 2am, that's on you. (We'll set up monitoring and alerts to make this painless.)
-- **You handle security.** An exposed server is an invitation. (We have an entire module on this -- it's not as scary as it sounds.)
-- **You manage updates.** New OpenClaw version? You run the update command. (It's one command, but you have to remember to do it.)
+- **You maintain the server.** If it goes down at 2am, that's on you. (We'll set up monitoring and alerts to make this painless -- Module 9.)
+- **You handle security.** An exposed server is an invitation. (We have an entire module on this -- Module 7. It's not as scary as it sounds.)
+- **You manage updates.** New OpenClaw version? You run the update command. (We automate this with GitHub Actions in Module 5.)
 
 The entire rest of this course is about making these tradeoffs manageable. By the end, you'll have a setup that mostly takes care of itself.
 
@@ -144,7 +151,7 @@ API keys look like random strings:
 - **Claude:** `sk-ant-api03-xxxx...xxxx` (starts with `sk-ant-`)
 - **OpenAI:** `sk-xxxx...xxxx` (starts with `sk-`)
 
-You'll create these in the exercise. For now, the key takeaway (pun fully intended): **treat API keys like passwords.** Don't put them in screenshots, don't commit them to GitHub, don't paste them in public chats. We'll cover proper secrets management in Module 6.
+You'll create these in the exercise. For now, the key takeaway (pun fully intended): **treat API keys like passwords.** Don't put them in screenshots, don't commit them to GitHub, don't paste them in public chats. We'll cover proper secrets management in Module 7.
 
 > **Pro tip:** Both Anthropic and OpenAI let you set spending limits. Always set one. A runaway script making API calls in a loop can burn through credits fast. We'll configure this during the exercise.
 
@@ -171,7 +178,8 @@ OpenClaw works with both Claude (Anthropic) and OpenAI (GPT). For this course, w
 Let's recap. You now understand:
 
 - **Chatbots** are scripted, **assistants** are smart but stateless, **agents** are smart + persistent + autonomous
-- **OpenClaw** is an open-source AI agent that runs on your VPS and connects to your chat apps
+- **OpenClaw** is an open-source AI agent that runs in Docker and connects to your chat apps
+- **Docker** gives us isolation, portability, and reproducibility (same setup on laptop and server)
 - **Self-hosting** gives you data control, model choice, integration freedom, 24/7 availability, and keeps costs low
 - **API keys** authenticate you and bill you -- treat them like passwords + credit cards
 - **Claude and OpenAI** both work; we're using Claude for this course

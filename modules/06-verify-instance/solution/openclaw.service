@@ -1,0 +1,30 @@
+# OpenClaw Gateway systemd Service -- Complete
+# ===============================================
+#
+# Install:
+#   sudo cp openclaw.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable openclaw
+#   sudo systemctl start openclaw
+#
+# Manage:
+#   sudo systemctl status openclaw    -- check status
+#   sudo systemctl restart openclaw   -- restart
+#   sudo journalctl -u openclaw -f   -- follow logs
+#
+
+[Unit]
+Description=OpenClaw Gateway
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/home/deploy
+ExecStart=/usr/bin/openclaw gateway start --foreground
+Restart=on-failure
+RestartSec=5
+Environment=HOME=/home/deploy
+
+[Install]
+WantedBy=multi-user.target

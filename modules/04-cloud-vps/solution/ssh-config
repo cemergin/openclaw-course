@@ -1,0 +1,47 @@
+# SSH Config -- OpenClaw VPS
+# ==========================
+#
+# Place this at ~/.ssh/config on your local machine.
+# Permissions: chmod 644 ~/.ssh/config
+#
+# Usage:
+#   ssh openclaw         -- connect as deploy user (daily use)
+#   ssh openclaw-admin   -- connect as ubuntu user (admin tasks)
+#
+
+Host openclaw
+    # Your VPS static IP (replace with your actual IP)
+    HostName 123.45.67.89
+
+    # The deploy user created in Exercise Part 11
+    User deploy
+
+    # Path to the private key generated in Exercise Step 28
+    IdentityFile ~/.ssh/openclaw
+
+    # SSH port
+    Port 22
+
+    # Keepalive settings -- prevents idle disconnections
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+
+Host openclaw-admin
+    # Same server, different user (for sudo operations)
+    HostName 123.45.67.89
+    User ubuntu
+    IdentityFile ~/.ssh/openclaw
+    Port 22
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+
+Host github.com
+    IdentityFile ~/.ssh/openclaw
+
+# ─────────────────────────────────────────────────────
+# NOTES:
+#
+# You can add more hosts to this file later. Each "Host"
+# block is independent. SSH reads the config top to bottom
+# and uses the first matching Host entry.
+# ─────────────────────────────────────────────────────

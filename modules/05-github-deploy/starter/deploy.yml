@@ -1,0 +1,48 @@
+# GitHub Actions Deploy Workflow Template
+# ========================================
+#
+# Copy this file to .github/workflows/deploy.yml in your repo.
+#
+# Before using, set these GitHub Secrets in your repo:
+#   - VPS_HOST: Your VPS static IP address
+#   - VPS_USER: deploy (the user created in Module 4)
+#   - VPS_SSH_KEY: Contents of your ~/.ssh/openclaw private key
+#
+
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+
+            # TODO: Clone or pull the repo
+            # Hint: check if ~/openclaw/.git exists
+
+            # TODO: Copy config/openclaw.json to ~/.openclaw/openclaw.json
+
+            # TODO: Copy workspace/* to ~/.openclaw/workspace/
+
+            # TODO: Update OpenClaw if needed (npm update -g openclaw)
+
+            # TODO: Restart the OpenClaw gateway
+
+            # TODO: Start support services (docker compose up -d)
+
+            echo "Deploy script not configured yet!"
+            exit 1

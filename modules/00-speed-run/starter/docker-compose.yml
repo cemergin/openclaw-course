@@ -1,0 +1,22 @@
+services:
+  openclaw-gateway:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-gateway
+    restart: unless-stopped
+    ports:
+      - "18789:18789"
+    volumes:
+      - openclaw_data:/home/node/.openclaw
+    environment:
+      - NODE_ENV=production
+
+  openclaw-cli:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-cli
+    volumes:
+      - openclaw_data:/home/node/.openclaw
+    profiles:
+      - cli
+
+volumes:
+  openclaw_data:

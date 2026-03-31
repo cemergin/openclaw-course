@@ -1,0 +1,49 @@
+# My Server Info
+# ==============
+# Fill this in as you complete the exercise. You'll reference these values
+# throughout the rest of the course.
+
+# AWS Region (e.g., eu-central-1, us-east-1):
+REGION=
+
+# Instance name (e.g., openclaw-01):
+INSTANCE_NAME=
+
+# Instance plan:
+INSTANCE_PLAN=$5 - 1 vCPU, 1GB RAM, 40GB SSD
+
+# Operating system:
+OS=Ubuntu 24.04 LTS
+
+# Static IP address (e.g., 18.194.123.45):
+STATIC_IP=
+
+# Static IP name (e.g., openclaw-ip):
+STATIC_IP_NAME=
+
+# Firewall rules (list what's allowed):
+FIREWALL_RULES=
+
+# Deploy username:
+DEPLOY_USER=deploy
+
+# SSH key path (local machine):
+SSH_KEY_PATH=~/.ssh/openclaw
+
+# Node.js version:
+NODE_VERSION=
+
+# OpenClaw version:
+OPENCLAW_VERSION=
+
+# Docker installed (yes/no):
+DOCKER_INSTALLED=
+
+# Docker Compose version:
+DOCKER_COMPOSE_VERSION=
+
+# Date created:
+DATE_CREATED=
+
+# Estimated monthly cost:
+ESTIMATED_MONTHLY_COST=

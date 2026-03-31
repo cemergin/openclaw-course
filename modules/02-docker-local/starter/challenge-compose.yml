@@ -1,0 +1,50 @@
+# Docker Compose Challenge -- Module 2
+# Build a three-service stack with nginx, whoami, and httpbin
+#
+# Your task: fill in the TODOs to create a working compose file.
+# Rename this file to docker-compose.yml when you're ready to use it.
+
+services:
+  web:
+    image: nginx:latest
+    container_name: challenge-web
+    restart: unless-stopped
+    ports:
+      # TODO: Map host port 8080 to container port 80
+      # Remember: bind to 127.0.0.1 for security!
+      - ""
+    volumes:
+      # TODO: Mount ./html to nginx's default HTML directory (read-only)
+      -
+      # TODO: Mount a named volume called nginx-cache to /var/cache/nginx
+      -
+    networks:
+      - playground
+
+  whoami:
+    # TODO: Set the image to Traefik's whoami service
+    image:
+    container_name: challenge-whoami
+    restart: unless-stopped
+    ports:
+      # TODO: Map host port 8081 to container port 80
+      - ""
+    networks:
+      - playground
+
+  httpbin:
+    # TODO: Set the image (hint: kennethreitz/httpbin)
+    image:
+    container_name: challenge-httpbin
+    restart: unless-stopped
+    ports:
+      # TODO: Map host port 8082 to container port 80
+      - ""
+    networks:
+      - playground
+
+networks:
+  playground:
+
+volumes:
+  # TODO: Declare the named volume for nginx-cache

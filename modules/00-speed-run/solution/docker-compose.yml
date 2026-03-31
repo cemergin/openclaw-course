@@ -1,0 +1,34 @@
+# Solution: docker-compose.yml for Speed Run (Module 0)
+#
+# Two-service pattern:
+#   - openclaw-gateway: the always-running agent (gateway + channels + tools)
+#   - openclaw-cli: on-demand CLI for onboarding, config, and admin commands
+#     (uses profiles: ["cli"] so it only runs when explicitly invoked)
+#
+# In the full course, this file grows as we add:
+#   - Cloudflare Tunnel service (Module 8)
+#   - Uptime Kuma monitoring (Module 9)
+#   - Kill switch service (Module 9)
+
+services:
+  openclaw-gateway:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-gateway
+    restart: unless-stopped
+    ports:
+      - "18789:18789"
+    volumes:
+      - openclaw_data:/home/node/.openclaw
+    environment:
+      - NODE_ENV=production
+
+  openclaw-cli:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-cli
+    volumes:
+      - openclaw_data:/home/node/.openclaw
+    profiles:
+      - cli
+
+volumes:
+  openclaw_data:

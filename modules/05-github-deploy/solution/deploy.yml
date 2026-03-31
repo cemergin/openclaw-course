@@ -1,0 +1,112 @@
+# GitHub Actions Deploy Workflow -- Complete
+# ============================================
+#
+# This workflow:
+#   1. Triggers on every push to main (or manual dispatch)
+#   2. SSHes into your VPS
+#   3. Clones or pulls the latest code
+#   4. Copies config and workspace files to ~/.openclaw/
+#   5. Updates OpenClaw if a newer version is available
+#   6. Restarts the OpenClaw gateway
+#   7. Starts/updates support services via Docker Compose
+#   8. Runs a health check
+#   9. Sends a Telegram notification (success or failure)
+#
+# Required GitHub Secrets:
+#   - VPS_HOST: Your VPS static IP address
+#   - VPS_USER: deploy
+#   - VPS_SSH_KEY: Contents of ~/.ssh/openclaw private key
+#
+# Optional GitHub Secrets (for notifications):
+#   - TELEGRAM_BOT_TOKEN: From @BotFather
+#   - TELEGRAM_CHAT_ID: Your Telegram chat ID
+#
+
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+
+            # --- Step 1: Clone or pull the repo ---
+            if [ ! -d ~/openclaw/.git ]; then
+              cd ~
+              rm -rf openclaw
+              git clone ${{ github.event.repository.ssh_url }} openclaw
+            else
+              cd ~/openclaw
+              git pull origin main
+            fi
+
+            # --- Step 2: Copy OpenClaw config ---
+            mkdir -p ~/.openclaw
+            cp ~/openclaw/config/openclaw.json ~/.openclaw/openclaw.json
+
+            # --- Step 3: Copy workspace files ---
+            mkdir -p ~/.openclaw/workspace
+            cp -r ~/openclaw/workspace/* ~/.openclaw/workspace/
+
+            # --- Step 4: Update OpenClaw if needed ---
+            sudo npm update -g openclaw
+
+            # --- Step 5: Restart OpenClaw gateway ---
+            openclaw gateway restart || openclaw gateway start
+
+            # --- Step 6: Start support services ---
+            cd ~/openclaw
+            docker compose up -d
+
+            echo "Deploy complete!"
+
+      - name: Health check
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Wait for gateway to initialize
+            sleep 5
+
+            # Check OpenClaw gateway
+            openclaw gateway status
+
+            # Check support services
+            cd ~/openclaw
+            docker compose ps
+
+            # Verify gateway is responding
+            curl -sf http://127.0.0.1:18789/ > /dev/null && echo "Gateway responding!" || (echo "Gateway NOT responding!" && exit 1)
+
+      - name: Notify success on Telegram
+        if: success()
+        run: |
+          curl -s -X POST \
+            "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="Deploy successful! Commit: ${{ github.event.head_commit.message }}"
+
+      - name: Notify failure on Telegram
+        if: failure()
+        run: |
+          curl -s -X POST \
+            "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="DEPLOY FAILED! Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

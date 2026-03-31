@@ -1,14 +1,14 @@
 title: "Deploy Your AI Agent — OpenClaw on the Cloud"
 slug: openclaw-cloud-deploy
-version: "1.0"
+version: "2.2"
 
 description: |
-  A hands-on, week-long course that takes you from "I can cd and ls" to running
-  your own AI agent on the cloud — properly secured, monitored, and ready for
-  daily use. You'll deploy OpenClaw on AWS, connect it to WhatsApp via Cloudflare
-  Tunnel, lock it down so only you can use it, and set up a kill switch you can
-  trigger from your phone. Includes a Speed Run track to get a working Telegram
-  bot running tonight.
+  A hands-on course that takes you from zero to a 24/7 AI agent on the cloud.
+  You start locally: get OpenClaw running in Docker on your laptop, build a
+  config-as-code repo with your personality, skills, and integrations, then
+  deploy natively to a cheap $5/mo VPS. Support services (monitoring, tunnel,
+  kill switch) run in Docker on the server. Everything is version-controlled
+  in Git — push a personality change and it deploys automatically.
 
 audience:
   description: |
@@ -19,53 +19,69 @@ audience:
   prerequisites:
     - Can navigate a terminal (cd, ls, mkdir, basic file operations)
     - Has a code editor they're comfortable with
-    - Has a credit card for AWS and API billing (small amounts — ~$15-20/mo total)
-    - Has a WhatsApp account on their phone
-    - Has a Telegram account (for Speed Run track)
+    - Has a credit card for AWS and API billing (~$8-10/mo total)
+    - Has a Telegram account (primary chat integration)
 
 outcomes:
-  - Provision and secure a cloud VPS from scratch (SSH keys, firewall, user management)
-  - Run containerized services with Docker and Docker Compose
-  - Deploy OpenClaw with WhatsApp integration via Cloudflare Tunnel
-  - Implement proper secrets management (Docker Secrets, not .env files)
-  - Understand and prevent the "lethal trifecta" (open ports + exposed secrets + no monitoring)
-  - Harden a server against common attack vectors
+  - Run OpenClaw in Docker locally and verify it works
+  - Build a config-as-code repo (openclaw.json, SOUL.md, skills, secrets)
+  - Connect Telegram via long polling (no tunnel needed)
+  - Provision and secure a $5/mo cloud VPS
+  - Deploy via GitHub Actions (git push to deploy)
+  - Implement proper secrets management (SecretRef + file-based secrets)
+  - Expose services securely via Cloudflare Tunnel (zero open ports)
+  - Monitor the stack and receive alerts when things break
   - Build a kill switch triggerable from a phone
-  - Monitor a stack and receive alerts when things break
-  - Connect bonus integrations (GitHub, Gmail, Notion, Google Drive, web search)
+  - Connect bonus integrations (GitHub, Gmail, Notion, Google Drive)
 
 tracks:
   speed_run:
     name: "Speed Run — Bot Tonight"
-    description: "Get a working OpenClaw Telegram bot in one evening. Minimal security, maximum dopamine."
+    description: "Get a working OpenClaw Telegram bot on your laptop in one evening."
     modules: [0]
     estimated_time: "2-3 hours"
-  deep_dive:
-    name: "Deep Dive — Production Ready"
-    description: "The full course. WhatsApp + Cloudflare, proper security, monitoring, kill switch."
-    modules: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+  full_course:
+    name: "Full Course — Local to Production"
+    description: "Local Docker -> config-as-code -> $5 VPS with monitoring and kill switch."
+    modules: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     estimated_time: "5-7 days"
 
 provider:
-  primary: AWS Lightsail
+  primary: AWS Lightsail (1GB, $5/mo — first 3 months free)
   alternatives: [Hetzner CAX11, DigitalOcean, Vultr, Linode]
+  home_server_note: |
+    A Mac Mini ($479) or old laptop pays for itself in ~2 years vs a VPS.
+    Everything in the course works on a home server — you just lose 24/7
+    uptime when your internet goes down.
 
 chat_integrations:
-  primary: WhatsApp (with Cloudflare Tunnel)
-  speed_run: Telegram
-  covered_as_reference: [Discord, Slack, Signal]
+  primary: Telegram (long polling — works locally and on server)
+  covered_as_reference: [Discord, Slack]
 
 security_approach: |
-  Dedicated security module (Module 5) establishes the mental model and serves
-  as a reference. Security concepts are also woven into every module — each
-  hands-on step explains the "why" alongside the "how."
+  Security is introduced after the bot is working (Module 7), so students
+  understand what they're protecting. OpenClaw's SecretRef pattern (source:
+  file) replaces Docker Secrets for the main app. Docker Secrets still used
+  for support services (cloudflared, monitoring).
+
+deployment_approach: |
+  Hybrid: OpenClaw runs natively on the VPS (npm i -g openclaw) for minimal
+  RAM usage on a $5/mo instance. Support services (Cloudflare Tunnel, Uptime
+  Kuma, kill switch) run in Docker containers. Config-as-code means the same
+  Git repo (openclaw.json, SOUL.md, skills/) works locally and on the server.
+  GitHub Actions auto-deploys config changes.
+
+config_as_code: |
+  The course teaches a config-as-code pattern where the student's Git repo is
+  the single source of truth for their agent's personality, skills, model
+  selection, and integration settings. The repo structure:
+    config/openclaw.json    — main config (JSON5, $include support)
+    workspace/SOUL.md       — bot personality and behavioral guidelines
+    workspace/IDENTITY.md   — bot name and role
+    workspace/skills/       — custom skill directories
+    secrets/                — .gitignored, created on server only
+    docker-compose.yml      — support services only (tunnel, monitoring)
 
 source_materials:
   - path: /Users/cemergin/lab/openclaw-vps-setup.md
     description: Comprehensive OpenClaw VPS setup guide (2100+ lines)
-    covers: |
-      Architecture, API keys, chat app credentials (Telegram, WhatsApp, Discord,
-      Slack, Signal, iMessage, Google Chat, Twitch), Gmail with security considerations,
-      GitHub tokens, Obsidian, Google Drive, Notion, Calendar, Web Search, Docker
-      Compose setup, secrets management (3 options), security hardening, kill switch
-      (4 methods), monitoring, AWS (Lightsail vs Fargate), cost estimates.

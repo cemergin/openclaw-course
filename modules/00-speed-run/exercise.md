@@ -2,221 +2,230 @@
 
 ## What We're Doing
 
-We're going from zero to a working Telegram bot powered by Claude, running on a cloud server you control. Every click, every command -- it's all here. Follow along and you'll have a working AI agent by the time you finish your coffee (or beer, no judgment).
+We're going from zero to a working Telegram bot powered by Claude, running in Docker on your laptop. Every click, every command -- it's all here. Follow along and you'll have a working AI agent by the time you finish your coffee (or beer, no judgment).
 
 ## What You'll Need
 
-- A laptop with a terminal (Terminal on Mac, PowerShell on Windows, or any Linux terminal)
-- A credit card for AWS (you won't be charged -- 3-month free tier)
+- A laptop (Mac, Windows, or Linux)
 - A Telegram account on your phone
+- A credit card for the Anthropic API (you'll spend pennies tonight)
 - About 2 hours of uninterrupted time
 
 ---
 
-## Part 1: Create Your Cloud Server (~15 minutes)
+## Part 1: Install Docker Desktop (~10 minutes)
 
-### Step 1: Create an AWS Account
+### Step 1: Download Docker Desktop
 
-If you already have an AWS account, skip to Step 2.
+If you already have Docker installed, skip to Part 2.
 
-1. Go to [aws.amazon.com](https://aws.amazon.com/) and click **Create an AWS Account**
-2. Enter your email, set a password, and choose an account name
-3. Enter your credit card info (required, but we're using the free tier)
-4. Complete phone verification
-5. Choose the **Basic Support (Free)** plan
+1. Go to [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/)
+2. Download the version for your OS:
+   - **Mac (Apple Silicon):** the "Mac with Apple chip" button
+   - **Mac (Intel):** the "Mac with Intel chip" button
+   - **Windows:** the "Windows" button (requires Windows 10/11 with WSL2)
+   - **Linux:** follow the instructions for your distro
+3. Run the installer and follow the prompts
+4. Launch Docker Desktop
 
-> **Don't panic** about the credit card. Lightsail has a flat $5/month price, and the first 3 months are free on the smallest plan. There are no surprise charges. This isn't one of those AWS horror stories.
+> **Windows users:** Docker Desktop requires WSL2 (Windows Subsystem for Linux). The installer will prompt you to enable it if it's not already on. Follow the prompts -- it's a one-time setup.
 
-### Step 2: Launch a Lightsail Instance
+### Step 2: Verify Docker is Running
 
-1. Go to [lightsail.aws.amazon.com](https://lightsail.aws.amazon.com/)
-2. Click **Create instance**
-3. Choose your settings:
-   - **Region:** Pick one close to you (it affects latency, but for a chat bot, anything works)
-   - **Platform:** Linux/Unix
-   - **Blueprint:** OS Only --> **Ubuntu 22.04 LTS**
-   - **Instance plan:** $5 USD/month (1 GB RAM, 1 vCPU, 40 GB SSD)
-     - Look for the "First 3 months free" badge
-   - **Instance name:** `openclaw` (or whatever you like)
-4. Click **Create instance**
-
-Your server will take about 60 seconds to start. You'll see it go from "Pending" to "Running."
-
-> **What just happened?** AWS just created a virtual computer for you in a data center. It's running Ubuntu Linux, it has its own IP address, and it's on 24/7. You're renting it for $5/month (free for now).
-
-### Step 3: Get Your Server's IP Address
-
-1. Click on your instance name (`openclaw`) in the Lightsail dashboard
-2. Look for the **Public IP** address -- it looks something like `54.123.45.67`
-3. Write this down or copy it somewhere. You'll need it in a minute.
-
-### Step 4: Download Your SSH Key
-
-1. On your instance page, go to the **Networking** tab (or look at the main Lightsail page)
-2. Actually -- Lightsail makes this easier. Go to **Account** (top-right menu) --> **SSH Keys**
-3. Click **Download** next to the default key for your region
-4. Save the file (it'll be called something like `LightsailDefaultKey-us-east-1.pem`)
-5. Note where you saved it (probably `~/Downloads/`)
-
-> **What's this file?** It's your SSH key -- think of it as a special password file that lets you log into your server. Don't share it, don't lose it, don't post it on social media.
-
----
-
-## Part 2: Connect to Your Server (~5 minutes)
-
-### Step 5: Set Key Permissions (Mac/Linux)
-
-Open your terminal and run:
+Open your terminal (Terminal on Mac, PowerShell on Windows) and run:
 
 ```bash
-chmod 400 ~/Downloads/LightsailDefaultKey-*.pem
+docker --version
 ```
-
-This tells your computer "only I can read this file." SSH is paranoid (in a good way) and refuses to use key files that other users could read.
-
-> **Windows users:** If you're using PowerShell, you may need to right-click the .pem file --> Properties --> Security --> adjust permissions. Or just use the Lightsail browser-based SSH (click the terminal icon on your instance in the dashboard) to skip this entirely.
-
-### Step 6: SSH Into Your Server
-
-Replace `YOUR_IP` with the IP address from Step 3:
-
-```bash
-ssh -i ~/Downloads/LightsailDefaultKey-*.pem ubuntu@YOUR_IP
-```
-
-**Before you hit enter:** what do you think will happen?
 
 You should see something like:
 
 ```
-Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 5.15.0-1028-aws x86_64)
-...
-ubuntu@ip-172-26-1-100:~$
+Docker version 27.x.x, build xxxxxxx
 ```
 
-That `ubuntu@ip-...` prompt means you're IN. Every command you type now runs on your cloud server, not your laptop. Wild, right?
-
-> **If it asks "Are you sure you want to continue connecting?"** type `yes` and press Enter. This happens the first time you connect to any new server. It's SSH asking you to trust this server's identity.
-
-> **Pro tip:** You can also use Lightsail's built-in browser terminal. On your instance page, click the orange terminal icon. No SSH key needed -- it connects through your browser. Great as a backup, but learning SSH is worth it.
-
-### Step 7: Quick Sanity Check
-
-Let's make sure your server is alive and well:
+Now verify Docker Compose:
 
 ```bash
-cat /etc/os-release | head -2
+docker compose version
 ```
 
 You should see:
 
 ```
-PRETTY_NAME="Ubuntu 22.04.x LTS"
-NAME="Ubuntu"
+Docker Compose version v2.x.x
 ```
 
-You're on an Ubuntu server in the cloud. Let's install some stuff.
+If both commands work, you're golden. If not, make sure Docker Desktop is actually running (check your system tray/menu bar for the whale icon).
+
+> **What just happened?** You installed a tool that lets you run software in isolated containers. Think of it as a mini virtual machine, but way faster and lighter. OpenClaw will run inside one of these containers.
 
 ---
 
-## Part 3: Install OpenClaw (~10 minutes)
+## Part 2: Create Your Project (~5 minutes)
 
-### Step 8: Update the System
-
-First, let's make sure everything is up to date:
+### Step 3: Create a Project Folder
 
 ```bash
-sudo apt update && sudo apt upgrade -y
+mkdir -p ~/openclaw-local
+cd ~/openclaw-local
 ```
 
-This downloads the latest package lists and upgrades any outdated software. It'll take a minute or two.
+### Step 4: Create the Docker Compose File
 
-### Step 9: Install Node.js
+Create a file called `docker-compose.yml` in your project folder. You can use any text editor -- VS Code, nano, vim, whatever you're comfortable with.
 
-OpenClaw runs on Node.js. Let's install it:
+```yaml
+services:
+  openclaw-gateway:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-gateway
+    restart: unless-stopped
+    ports:
+      - "18789:18789"
+    volumes:
+      - openclaw_data:/home/node/.openclaw
+    environment:
+      - NODE_ENV=production
 
-```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
+  openclaw-cli:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-cli
+    volumes:
+      - openclaw_data:/home/node/.openclaw
+    profiles:
+      - cli
+
+volumes:
+  openclaw_data:
 ```
 
-Verify it worked:
+> **What's this file?** It defines two services from the same OpenClaw image. The **gateway** is the always-running agent -- it handles messages, talks to AI models, manages memory. The **CLI** is an on-demand helper for setup commands. Both share the same data volume at `/home/node/.openclaw` so config written by the CLI is immediately available to the gateway. The `profiles: [cli]` trick means the CLI only runs when you explicitly ask for it.
 
-```bash
-node --version
-npm --version
-```
-
-You should see version numbers (Node 20.x and npm 10.x or similar). If you see "command not found," something went wrong -- re-run the install commands above.
-
-### Step 10: Install OpenClaw
-
-Here's the moment of truth:
-
-```bash
-curl -fsSL https://openclaw.ai/install.sh | bash
-```
-
-Alternatively, if you prefer npm:
-
-```bash
-npm i -g openclaw
-```
-
-Verify it installed:
-
-```bash
-openclaw --version
-```
-
-You should see a version number. OpenClaw is on your server.
-
-> **What just happened?** You downloaded and installed OpenClaw globally on your server. It's now available as a command you can run from anywhere.
+Save the file.
 
 ---
 
-## Part 4: Get Your API Keys (~10 minutes)
+## Part 3: Start OpenClaw (~5 minutes)
 
-OpenClaw needs an AI brain. You'll get an API key from Claude (Anthropic) or OpenAI -- or both. Claude is recommended, but either works.
+### Step 5: Pull and Start OpenClaw
 
-### Step 11: Get a Claude API Key (Recommended)
+From your project folder, run:
+
+```bash
+docker compose up -d
+```
+
+The `-d` flag means "detached" -- it runs in the background so you get your terminal back.
+
+You'll see Docker pull the OpenClaw image from GitHub Container Registry (this takes a minute the first time -- it's downloading the software). Then it'll start the gateway container.
+
+Verify it's running:
+
+```bash
+docker compose ps
+```
+
+You should see something like:
+
+```
+NAME               IMAGE                                STATUS          PORTS
+openclaw-gateway   ghcr.io/openclaw/openclaw:latest     Up 10 seconds   0.0.0.0:18789->18789/tcp
+```
+
+Notice only the gateway is running -- the CLI service stays dormant until you need it.
+
+Check the logs to make sure it started okay:
+
+```bash
+docker compose logs openclaw-gateway
+```
+
+Look for a message indicating OpenClaw is running. If you see errors, check the troubleshooting section at the end.
+
+> **What just happened?** Docker downloaded the OpenClaw image (a pre-built package of all the software) and started the gateway in a container. OpenClaw is now running on your machine, listening on port 18789. The container runs as the `node` user (uid 1000) and stores all its data at `/home/node/.openclaw`.
+
+---
+
+## Part 4: Get Your Claude API Key (~5 minutes)
+
+OpenClaw needs an AI brain. You'll get an API key from Anthropic (Claude).
+
+### Step 6: Create Your Anthropic Account
 
 1. Go to [console.anthropic.com](https://console.anthropic.com/)
 2. Sign up or log in
 3. Go to **Settings** --> **API Keys** --> **Create Key**
-4. Give it a name like "openclaw"
+4. Give it a name like `openclaw-local`
 5. Copy the key -- it starts with `sk-ant-...`
 6. **Important:** Save this key somewhere safe (a notes app, password manager, whatever). You won't be able to see it again after you close this page.
 7. Go to **Plans & Billing** and add a payment method (pay-as-you-go)
 
+### Step 7: Set a Spending Limit
+
+While you're in the billing section:
+
+1. Find **Usage Limits**
+2. Set a monthly limit of **$10** (plenty for learning)
+3. Set a notification threshold at **$5**
+
 > **How much will this cost?** For personal chat use, expect $1-5/month. Claude charges per token (roughly per word). A typical back-and-forth conversation costs fractions of a cent. You'd have to work really hard to spend $20 in a month.
-
-### Step 11b: Get an OpenAI API Key (Alternative)
-
-If you prefer GPT over Claude:
-
-1. Go to [platform.openai.com](https://platform.openai.com/)
-2. Sign up or log in
-3. Go to **API Keys** --> **Create new secret key**
-4. Copy the key (starts with `sk-...`)
-5. Add billing info under **Settings** --> **Billing**
-
-### Step 12: Keep Your Key Handy
-
-You'll need to paste your API key in a few minutes during OpenClaw setup. Keep the tab open or paste it into a temporary note.
 
 ---
 
-## Part 5: Create Your Telegram Bot (~5 minutes)
+## Part 5: Run OpenClaw Onboarding (~10 minutes)
 
-### Step 13: Talk to the BotFather
+### Step 8: Run the Onboarding Wizard
+
+This is where we configure OpenClaw with your AI provider. We use the CLI service for this:
+
+```bash
+docker compose run --rm openclaw-cli openclaw onboard
+```
+
+**Before you hit enter:** what do you think this does? `docker compose run --rm` means "spin up the CLI service, run a command, and remove the container when done." The `openclaw-cli` is the service name from our compose file. `openclaw onboard` is the command to run inside it.
+
+This starts an interactive setup wizard. It'll ask you questions -- here's what to expect:
+
+1. **AI Provider:** Choose Claude (Anthropic)
+2. **API Key:** Paste the key you got in Step 6
+3. **Model:** Choose Claude Sonnet (fast, smart, affordable)
+4. Follow any additional prompts (name, personality, etc.)
+
+> **Pro tip:** When pasting into a terminal, use `Ctrl+Shift+V` (Linux/Windows) or `Cmd+V` (Mac). Right-click also works in many terminals.
+
+The onboarding wizard writes its config to `/home/node/.openclaw/openclaw.json` (JSON5 format). Because both the CLI and gateway share the same data volume, the gateway can read this config immediately.
+
+### Step 9: Restart the Gateway
+
+After onboarding, restart the gateway so it picks up the new config:
+
+```bash
+docker compose restart openclaw-gateway
+```
+
+### Step 10: Verify It Works
+
+Check the gateway status:
+
+```bash
+docker compose run --rm openclaw-cli openclaw gateway status
+```
+
+You should see that the gateway is running and connected to your AI provider.
+
+---
+
+## Part 6: Create Your Telegram Bot (~5 minutes)
+
+### Step 11: Talk to the BotFather
 
 1. Open Telegram on your phone (or desktop app)
 2. Search for **@BotFather** (it has a blue checkmark -- make sure it's the real one)
 3. Tap **Start** or send `/start`
 4. Send `/newbot`
 
-### Step 14: Name Your Bot
+### Step 12: Name Your Bot
 
 BotFather will ask you two questions:
 
@@ -231,7 +240,7 @@ BotFather will ask you two questions:
    - `jarvis_personal_bot`
    - `cemergin_ai_bot`
 
-### Step 15: Copy Your Bot Token
+### Step 13: Copy Your Bot Token
 
 BotFather will respond with something like:
 
@@ -250,46 +259,43 @@ Copy that token (the long string with the colon in the middle). You'll need it i
 
 ---
 
-## Part 6: Wire Everything Together (~10 minutes)
+## Part 7: Connect Telegram to OpenClaw (~5 minutes)
 
-### Step 16: Run OpenClaw Onboarding
+### Step 14: Add the Telegram Channel
 
-Switch back to your SSH terminal (the one connected to your server) and run:
-
-```bash
-openclaw onboard
-```
-
-This starts an interactive setup wizard. It'll ask you questions -- here's what to expect:
-
-1. **AI Provider:** Choose Claude (Anthropic) or OpenAI
-2. **API Key:** Paste the key you got in Step 11
-3. **Chat integration:** Choose Telegram
-4. **Telegram Bot Token:** Paste the token from Step 15
-5. Follow any additional prompts (model selection, name, etc.)
-
-> **Pro tip:** When pasting into an SSH terminal, use `Ctrl+Shift+V` (Linux) or `Cmd+V` (Mac). Right-click also works in many terminals.
-
-### Step 17: Start OpenClaw
-
-After onboarding completes, start OpenClaw:
+Use the CLI service to add the Telegram channel:
 
 ```bash
-openclaw start
+docker compose run --rm openclaw-cli openclaw channels add telegram
 ```
 
-You should see output indicating it's running and connected to Telegram. Look for something like "Telegram bot connected" or "Listening for messages."
+It will ask for your Telegram Bot Token. Paste the token from Step 13.
 
-> **If something goes wrong:** Check the output for error messages. The most common issues are:
-> - **Invalid API key** -- double-check you copied the whole thing, no extra spaces
-> - **Invalid Telegram token** -- same thing, check for typos
-> - **Port already in use** -- run `openclaw stop` first, then `openclaw start`
+OpenClaw will configure Telegram with **long polling** -- it reaches out to Telegram's servers to check for messages. No tunnel, no webhooks, no open ports. It just works.
+
+> **Why long polling?** Because we're running locally. Your laptop doesn't have a public URL that Telegram can call back to. Long polling flips the direction -- OpenClaw asks Telegram "got anything for me?" every few seconds. It's all outbound traffic, which means it works from behind any firewall, any NAT, any coffee shop WiFi.
+
+### Step 15: Restart the Gateway
+
+After adding the channel, restart the gateway so it picks up the new channel config:
+
+```bash
+docker compose restart openclaw-gateway
+```
+
+Check the logs to confirm Telegram connected:
+
+```bash
+docker compose logs --tail 20 openclaw-gateway
+```
+
+Look for something like "Telegram bot connected" or "Listening for messages." If you see it, you're in business.
 
 ---
 
-## Part 7: The Moment of Truth (~1 minute)
+## Part 8: The Moment of Truth (~1 minute)
 
-### Step 18: Send Your First Message
+### Step 16: Send Your First Message
 
 1. Open Telegram on your phone
 2. Search for your bot's username (the one ending in `_bot`)
@@ -298,70 +304,27 @@ You should see output indicating it's running and connected to Telegram. Look fo
    - "Hello! Are you alive?"
    - "What's the meaning of life?"
    - "Explain quantum computing like I'm five"
-   - "Write me a haiku about cloud servers"
+   - "Write me a haiku about Docker containers"
 
-**Before you send it:** take a breath. You built a cloud server, installed an AI agent, created a bot, and wired them together. That message is about to travel from your phone, through Telegram's servers, to a computer you rented in the cloud, through Claude's API, and back. All in a few seconds.
+**Before you send it:** take a breath. You installed Docker, started an AI agent in a container, created a Telegram bot, and wired them together. That message is about to travel from your phone, through Telegram's servers, to a Docker container on your laptop, through Claude's API, and back. All in a few seconds.
 
 Now send it.
 
-### Step 19: Wait for the Response
+### Step 17: Wait for the Response
 
 Watch your Telegram chat. Within a few seconds, you should see your bot typing... and then a response appears.
 
-If you're watching your SSH terminal at the same time, you might see logs showing the message being received and processed.
+If you check the logs at the same time, you'll see the message being received and processed:
+
+```bash
+docker compose logs --tail 10 -f openclaw-gateway
+```
+
+(The `-f` flag means "follow" -- it streams new log entries in real time. Press `Ctrl+C` to stop watching.)
 
 **It works.**
 
-You just built a personal AI agent that runs on your own server. It's running right now, even if you close your laptop. You can message it from bed, from the subway, from another country. It's yours.
-
----
-
-## Part 8: Keep It Running (~5 minutes)
-
-### Step 20: Run in the Background
-
-Right now, if you close your SSH terminal, OpenClaw stops. Let's fix that:
-
-```bash
-# Stop the current instance first
-openclaw stop
-
-# Start it in the background using nohup
-nohup openclaw start > ~/openclaw.log 2>&1 &
-```
-
-Now you can close your terminal and it'll keep running.
-
-> **What's nohup?** It stands for "no hangup" -- it tells the process to keep running even when you disconnect. The `> ~/openclaw.log 2>&1 &` part sends all output to a log file and runs it in the background.
-
-To check if it's still running later:
-
-```bash
-# Check the process
-ps aux | grep openclaw
-
-# Check the logs
-tail -20 ~/openclaw.log
-```
-
-To stop it:
-
-```bash
-openclaw stop
-# or if that doesn't work:
-pkill -f openclaw
-```
-
-### Step 21: Set It to Start on Boot (Optional)
-
-If your server reboots, OpenClaw won't auto-start with the `nohup` approach. For tonight, that's fine. The full course (Module 9) sets this up properly with Docker and auto-restart policies.
-
-If you want a quick fix:
-
-```bash
-# Add to crontab
-(crontab -l 2>/dev/null; echo "@reboot cd /home/ubuntu && nohup openclaw start > ~/openclaw.log 2>&1 &") | crontab -
-```
+You just built a personal AI agent running in Docker on your laptop. You can message it from your phone as long as your laptop is on and Docker is running. It's yours.
 
 ---
 
@@ -372,71 +335,99 @@ Let's recap what you built:
 ```
 Your phone (Telegram)
   --> Telegram servers (relay)
-    --> AWS Lightsail VPS ($5/mo, running 24/7)
-      --> OpenClaw (your AI agent)
+    --> Docker on your laptop
+      --> OpenClaw gateway (port 18789)
         --> Claude API (the brain)
           --> Response flows back to your phone
 ```
 
 You now have:
-- A cloud server running Ubuntu, accessible via SSH
-- OpenClaw installed and configured
-- A Telegram bot connected to Claude
-- An AI agent you can message from your phone, 24/7
+- Docker Desktop running on your machine
+- OpenClaw gateway running in a container with persistent data at `/home/node/.openclaw`
+- A CLI service for on-demand admin commands
+- A Telegram bot connected via long polling
+- An AI agent you can message from your phone
 
 **What you don't have (yet):**
-- Proper security (firewall, dedicated user, encrypted secrets)
-- Docker containers (clean, isolated, easy to update)
-- WhatsApp integration (requires Cloudflare Tunnel)
+- A server that runs 24/7 (close your laptop and the bot stops)
+- Proper security (encrypted secrets, firewall)
 - Monitoring (know when things break)
 - A kill switch (emergency stop from your phone)
+- Auto-deployment (git push to update)
 
-That's what the full course (Modules 1-12) is for. But tonight? Tonight you have a working bot. Enjoy it.
+That's what the full course (Modules 1-10) is for. But tonight? Tonight you have a working bot. Enjoy it.
 
 ---
 
 ## Troubleshooting
 
-**"Permission denied" when SSHing:**
-- Make sure you ran `chmod 400` on the .pem file
-- Make sure you're using `ubuntu@YOUR_IP` (not `root@`)
-- Make sure the IP address is correct (check Lightsail dashboard)
+**Docker Desktop won't start:**
+- **Mac:** Make sure you have enough disk space and RAM. Docker Desktop needs at least 2GB.
+- **Windows:** Make sure WSL2 is enabled. Open PowerShell as admin and run `wsl --install`.
+- Restart your machine and try again (seriously, this fixes most Docker startup issues).
 
-**"Connection refused" when SSHing:**
-- Your instance might still be starting. Wait 30 seconds and try again
-- Check the Lightsail dashboard -- is the instance "Running"?
+**`docker compose up` fails:**
+- Make sure Docker Desktop is running (check the whale icon in your system tray)
+- Make sure you're in the right directory (where your `docker-compose.yml` file is)
+- Check the error message -- it usually tells you what's wrong
 
-**OpenClaw won't start:**
-- Run `openclaw --version` to verify it's installed
-- Check `node --version` -- you need Node.js 18+
-- Look at the error message carefully -- it usually tells you what's wrong
+**OpenClaw onboarding fails:**
+- Make sure the gateway is running: `docker compose ps`
+- Check the logs: `docker compose logs openclaw-gateway`
+- Try stopping and restarting: `docker compose down && docker compose up -d`
 
 **Bot doesn't respond to messages:**
-- Check the logs: `tail -50 ~/openclaw.log`
-- Verify your Telegram token is correct: run `openclaw onboard` again
-- Make sure OpenClaw is actually running: `ps aux | grep openclaw`
+- Check the logs: `docker compose logs --tail 50 openclaw-gateway`
+- Verify your Telegram token is correct: try the channel add step again
+- Make sure the gateway is running: `docker compose ps`
 - Check your API key has billing enabled (Claude requires a payment method)
+- Run diagnostics: `docker compose run --rm openclaw-cli openclaw doctor`
 
 **"Insufficient funds" or API errors:**
-- Make sure you've added billing info to your Claude/OpenAI account
+- Make sure you've added billing info to your Anthropic account
 - Check your API dashboard for any error messages
+- Make sure your spending limit hasn't been reached
+
+**Container keeps restarting:**
+- Check the logs immediately after it starts: `docker compose logs -f openclaw-gateway`
+- The most common cause is a bad API key or missing onboarding
 
 **Everything else:**
+- Run diagnostics: `docker compose run --rm openclaw-cli openclaw doctor`
 - Check the [OpenClaw docs](https://openclaw.ai)
 - The full course (starting with Module 1) covers everything in much more detail
 
 ---
 
-## Try This (Optional Experiments)
+## Quick Reference
 
-Now that your bot is working, play with it:
+Here are the commands you'll use most:
 
-- [ ] Ask it something you'd normally Google
-- [ ] Ask it to write code in your favorite language
-- [ ] Ask it to explain a concept you've been struggling with
-- [ ] Ask it to roleplay as a character
-- [ ] Ask it what it knows about itself (it should mention OpenClaw)
-- [ ] Send it a really long message and see how it handles it
-- [ ] Ask it to remember something, then ask about it in a new message (test its memory)
+```bash
+# Start the gateway
+docker compose up -d
+
+# Stop everything
+docker compose down
+
+# Check what's running
+docker compose ps
+
+# View gateway logs
+docker compose logs openclaw-gateway
+docker compose logs --tail 20 -f openclaw-gateway
+
+# Restart the gateway
+docker compose restart openclaw-gateway
+
+# Run CLI commands (onboarding, config, channels)
+docker compose run --rm openclaw-cli openclaw onboard
+docker compose run --rm openclaw-cli openclaw channels add telegram
+docker compose run --rm openclaw-cli openclaw gateway status
+docker compose run --rm openclaw-cli openclaw doctor
+
+# Open a shell inside the CLI container
+docker compose run --rm openclaw-cli bash
+```
 
 When you're done playing, head to the [challenge](challenge.md) for some fun customization ideas.

@@ -7,7 +7,7 @@ Before we touch a single server, we need to talk about *what* we're building and
 ## Key Concepts
 
 - AI agents vs chatbots vs assistants -- what makes each one tick
-- The OpenClaw architecture: your phone, a chat app, a VPS, and AI APIs
+- The OpenClaw architecture: your phone, a chat app, Docker, and AI APIs
 - API keys and pay-per-use billing (how the money works)
 - Self-hosting tradeoffs: control and privacy vs maintenance responsibility
 - Claude vs OpenAI: choosing your AI brain
@@ -20,10 +20,10 @@ You should be comfortable using a web browser and creating online accounts. That
 
 ## Builds On
 
-This is where it all begins. No prior modules required.
+This is where the full course begins. No prior modules required.
 
 If you completed the **Speed Run (Module 0)**, you already have a working bot and a rough sense of these concepts. This module fills in the "why" behind everything you did there.
 
 ## What's Next
 
-In **Module 2: Your Computer in the Sky**, we'll spin up an actual server on AWS Lightsail -- your always-on computer in the cloud. The mental model you build here will make every decision in that module click into place.
+In **Module 2: Docker on Your Machine**, we'll dive deep into Docker -- containers, images, Compose, volumes, networks. The mental model you build here will make every decision in that module click into place.

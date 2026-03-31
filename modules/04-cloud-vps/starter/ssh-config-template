@@ -1,0 +1,42 @@
+# SSH Config Template for OpenClaw VPS
+# ======================================
+#
+# Copy this file to ~/.ssh/config on your LOCAL machine:
+#
+#   cp ssh-config-template ~/.ssh/config
+#
+# Then customize the values below and set permissions:
+#
+#   chmod 644 ~/.ssh/config
+#
+# After that, you can connect with just: ssh openclaw
+#
+
+Host openclaw
+    # TODO: Replace with your VPS static IP address
+    HostName YOUR_VPS_IP_HERE
+
+    # TODO: Set to "deploy" after creating the deploy user (Part 11)
+    # Use "ubuntu" until then
+    User deploy
+
+    # Path to your private key from Exercise Step 28
+    IdentityFile ~/.ssh/openclaw
+
+    # The SSH port (default is 22)
+    Port 22
+
+    # Keep the connection alive -- sends a ping every 60 seconds
+    # so your session doesn't drop when you step away
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+
+# Uncomment and customize this block for admin access:
+#
+# Host openclaw-admin
+#     HostName YOUR_VPS_IP_HERE
+#     User ubuntu
+#     IdentityFile ~/.ssh/openclaw
+#     Port 22
+#     ServerAliveInterval 60
+#     ServerAliveCountMax 3

@@ -19,7 +19,7 @@ This matters because when your OpenClaw agent is running, it's making exactly th
 3. Select **Claude Sonnet** as the model (this will be your default for OpenClaw)
 4. Send this exact prompt:
 
-   > You are a helpful personal AI agent. The user just sent you this message via WhatsApp: "Hey, what's a good recipe for dinner tonight? I have chicken, rice, and broccoli." Respond naturally, like a friendly assistant.
+   > You are a helpful personal AI agent. The user just sent you this message via Telegram: "Hey, what's a good recipe for dinner tonight? I have chicken, rice, and broccoli." Respond naturally, like a friendly assistant.
 
 5. Note the response. Check the token count and estimated cost shown in the interface.
 
@@ -36,7 +36,7 @@ This matters because when your OpenClaw agent is running, it's making exactly th
 9. Select **GPT-4o** and send the same prompt from step 4
 10. Compare the GPT-4o response to Claude Sonnet's response:
     - Which feels more natural for a personal assistant?
-    - Which one followed the "via WhatsApp" context better?
+    - Which one followed the "via Telegram" context better?
     - Any differences in tone, length, or helpfulness?
 
 ### Part 3: Stress-Test with a Harder Prompt
@@ -49,7 +49,7 @@ This matters because when your OpenClaw agent is running, it's making exactly th
 
 13. Now try a prompt that involves reasoning:
 
-    > I'm deciding between AWS Lightsail ($5/mo, 1GB RAM, managed) and Hetzner CAX11 ($4/mo, 4GB RAM, unmanaged). I want to run an AI agent with Docker. I'm new to servers. What would you recommend and why?
+    > I'm deciding between AWS Lightsail ($20/mo, 4GB RAM, managed) and Hetzner CAX11 ($4/mo, 4GB RAM, unmanaged). I want to run an AI agent with Docker. I'm new to servers. What would you recommend and why?
 
 14. Notice how the model handles tradeoffs and recommendations. This is the kind of thinking your agent does when you ask it for help.
 
@@ -97,14 +97,14 @@ For simple prompts, the differences between models can be subtle. Try something 
 **Claude Haiku:**
 - Responds almost instantly
 - Gives a solid, concise answer
-- Might miss subtle context clues (like adjusting tone for WhatsApp vs email)
+- Might miss subtle context clues (like adjusting tone for Telegram vs email)
 - Cheapest option by far
 - Best for: simple Q&A, quick lookups, high-volume low-stakes tasks
 
 **Claude Sonnet:**
 - Responds in 1-3 seconds
 - Balanced quality -- good at following nuanced instructions
-- Picks up on context like "via WhatsApp" and adjusts format/length appropriately
+- Picks up on context like "via Telegram" and adjusts format/length appropriately
 - Mid-range pricing
 - Best for: daily personal agent use (this is what we'll default to)
 

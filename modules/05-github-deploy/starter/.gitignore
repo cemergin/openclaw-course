@@ -1,0 +1,17 @@
+# Secrets -- NEVER commit these
+.env
+secrets/
+*.key
+*.pem
+
+# Docker runtime files
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~

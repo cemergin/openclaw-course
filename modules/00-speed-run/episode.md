@@ -2,15 +2,16 @@
 
 ## In This Episode
 
-You're going to go from zero to a working AI agent on your phone in a single evening. We'll spin up a cheap cloud server, install OpenClaw, create a Telegram bot, and wire them together. By the end, you'll message your bot from your phone and get an answer back from Claude. Security is minimal -- we'll fix that in the full course -- but tonight is about the dopamine hit of "holy crap, I built this and it actually works."
+You're going to go from zero to a working AI agent on your phone in a single evening. No servers, no cloud accounts, no SSH -- just Docker Desktop on your laptop, an OpenClaw container, and a Telegram bot. By the end, you'll message your bot from your phone and get an answer back from Claude. It runs on your machine, it's yours, and it works tonight.
 
 ## Key Concepts
 
-- **OpenClaw** -- an open-source personal AI agent that runs on your own hardware, 24/7
-- **VPS** -- a computer in the cloud that's always on (even when your laptop isn't)
-- **SSH** -- remote control for that cloud computer
+- **OpenClaw** -- an open-source personal AI agent that runs on your own hardware
+- **Docker** -- a way to run software in an isolated box (no messy installs on your system)
+- **docker-compose** -- a file that describes which boxes to run and how they connect
+- **Two-service pattern** -- an always-running gateway (port 18789) + an on-demand CLI for setup
 - **API keys** -- passwords that let OpenClaw talk to Claude or GPT
-- **Telegram bots** -- the fastest way to get a chat interface to your agent
+- **Telegram bots** -- the fastest way to get a chat interface to your agent (long polling -- works locally, no tunnel needed)
 
 ## Prerequisites
 
@@ -20,4 +21,6 @@ You should be comfortable with basic terminal commands (`cd`, `ls`, `mkdir`). If
 
 ## What's Next
 
-If you finish this and want to understand *why* everything works (and make it production-ready with WhatsApp, proper security, monitoring, and a kill switch), continue to [Module 1: What Are AI Agents?](../01-ai-agents/episode.md). The full course rebuilds everything you did tonight -- but properly.
+If you finish this and want to understand *why* everything works (and make it production-ready with proper security, monitoring, and a kill switch you can trigger from your phone), continue to [Module 1: What Are AI Agents?](../01-ai-agents/episode.md). The full course (Modules 1-10) rebuilds everything you did tonight -- but properly, on a server that never sleeps.
+
+**The pitch:** Your bot runs on your laptop. When you close the lid, it stops. The full course teaches you to put it on a server that runs 24/7.

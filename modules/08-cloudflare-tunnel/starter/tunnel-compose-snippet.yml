@@ -1,0 +1,40 @@
+# tunnel-compose-snippet.yml (STARTER TEMPLATE)
+#
+# Add this service to your docker-compose.yml to enable Cloudflare Tunnel.
+# This creates an outbound-only connection to Cloudflare -- zero inbound ports needed.
+#
+# In the hybrid approach:
+# - cloudflared runs in Docker and routes to both Docker services and native OpenClaw
+# - Docker services: reached by container name (e.g., uptime-kuma:3001)
+# - Native OpenClaw: reached via localhost:18789
+#
+# BEFORE USING:
+# 1. Create a tunnel in the Cloudflare Zero Trust dashboard
+# 2. Copy the tunnel token
+# 3. Save it as a Docker secret: echo -n "your-token" > secrets/cloudflare_tunnel_token
+# 4. chmod 600 secrets/cloudflare_tunnel_token
+# 5. Add this service and the secret declaration to your docker-compose.yml
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    # TODO: The token is read from the secret file at runtime.
+    # Replace this command with the actual tunnel run command.
+    command: >
+      sh -c 'echo "TODO: Configure tunnel token" && sleep 3600'
+    secrets:
+      - cloudflare_tunnel_token
+    networks:
+      - openclaw-net
+    # NOTE: No ports section! This container makes outbound connections only.
+
+# Add this to the top-level secrets section of your docker-compose.yml:
+secrets:
+  cloudflare_tunnel_token:
+    file: ./secrets/cloudflare_tunnel_token
+
+# Make sure your network is defined:
+networks:
+  openclaw-net:

@@ -1,0 +1,48 @@
+# tunnel-compose-snippet.yml (COMPLETED)
+#
+# Cloudflare Tunnel service for zero-port exposure.
+# The tunnel token is stored as a Docker secret and read at runtime.
+#
+# In the hybrid approach, cloudflared routes to:
+# - Docker services by container name (uptime-kuma:3001, killswitch:9090)
+# - Native OpenClaw via localhost:18789
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    # Read the tunnel token from the Docker secret file and pass it to cloudflared.
+    # We use sh -c so we can use command substitution to read the secret.
+    command: >
+      sh -c 'tunnel --no-autoupdate run --token $$(cat /run/secrets/cloudflare_tunnel_token)'
+    secrets:
+      - cloudflare_tunnel_token
+    networks:
+      - openclaw-net
+    # No ports section -- this container makes outbound connections only.
+    # That's the whole point: zero inbound ports.
+
+# Add to the top-level secrets section:
+secrets:
+  cloudflare_tunnel_token:
+    file: ./secrets/cloudflare_tunnel_token
+
+# Shared network so cloudflared can reach other Docker services by container name:
+networks:
+  openclaw-net:
+
+# ---------------------------------------------------------------
+# CLOUDFLARE DASHBOARD ROUTES (configure in Zero Trust > Tunnels):
+#
+# | Subdomain  | Domain          | Type | URL                  |
+# |------------|-----------------|------|----------------------|
+# | status     | yourdomain.com  | HTTP | uptime-kuma:3001     |  <-- Docker container
+# | openclaw   | yourdomain.com  | HTTP | localhost:18789      |  <-- Native process
+# | killswitch | yourdomain.com  | HTTP | killswitch:9090      |  <-- Docker container
+#
+# Docker services use container names because cloudflared is on
+# the same Docker network (openclaw-net).
+# Native OpenClaw uses localhost:18789 because it runs directly
+# on the VPS, not in a container.
+# ---------------------------------------------------------------

@@ -1,68 +1,87 @@
-# Speed Run Cheat Sheet
+# Speed Run Cheatsheet
 
-Keep this open in a separate tab while following the exercise.
+Quick reference for all commands used in Module 0.
 
-## Accounts You Need
-
-| Service | URL | What You Get |
-|---------|-----|-------------|
-| AWS | [aws.amazon.com](https://aws.amazon.com/) | Cloud server (Lightsail) |
-| Anthropic | [console.anthropic.com](https://console.anthropic.com/) | Claude API key (`sk-ant-...`) |
-| OpenAI (alt) | [platform.openai.com](https://platform.openai.com/) | GPT API key (`sk-...`) |
-| Telegram | @BotFather in Telegram app | Bot token (`123456:ABC...`) |
-
-## SSH Connection
+## Docker Basics
 
 ```bash
-# Set key permissions (once)
-chmod 400 ~/Downloads/LightsailDefaultKey-*.pem
+# Check Docker is installed
+docker --version
+docker compose version
 
-# Connect
-ssh -i ~/Downloads/LightsailDefaultKey-*.pem ubuntu@YOUR_IP
+# Start OpenClaw (from your project folder)
+docker compose up -d
+
+# Stop OpenClaw
+docker compose down
+
+# Restart the gateway
+docker compose restart openclaw-gateway
+
+# Check what's running
+docker compose ps
+
+# View logs (last 20 lines, follow new output)
+docker compose logs --tail 20 -f openclaw-gateway
+
+# View all logs
+docker compose logs openclaw-gateway
 ```
 
-## Server Setup Commands
+## OpenClaw Commands (via the CLI service)
 
 ```bash
-# Update system
-sudo apt update && sudo apt upgrade -y
+# Run onboarding (set up AI provider, API key, etc.)
+docker compose run --rm openclaw-cli openclaw onboard
 
-# Install Node.js
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
+# Add a Telegram channel
+docker compose run --rm openclaw-cli openclaw channels add telegram
 
-# Install OpenClaw
-curl -fsSL https://openclaw.ai/install.sh | bash
+# Check gateway status
+docker compose run --rm openclaw-cli openclaw gateway status
 
-# Configure
-openclaw onboard
+# Run diagnostics
+docker compose run --rm openclaw-cli openclaw doctor
 
-# Start
-openclaw start
-
-# Start in background (persists after disconnect)
-nohup openclaw start > ~/openclaw.log 2>&1 &
+# Open a shell inside the CLI container
+docker compose run --rm openclaw-cli bash
 ```
 
-## Daily Operations
+## Telegram Bot Setup
+
+1. Open Telegram, search for **@BotFather**
+2. Send `/newbot`
+3. Choose a display name (anything you want)
+4. Choose a username (must end in `bot`)
+5. Copy the token BotFather gives you
+
+## API Key Sources
+
+| Provider | Console URL | Key prefix |
+|----------|------------|------------|
+| Anthropic (Claude) | console.anthropic.com | `sk-ant-...` |
+| OpenAI (GPT) | platform.openai.com | `sk-...` |
+
+## Troubleshooting
 
 ```bash
-# Check if running
-ps aux | grep openclaw
+# Gateway won't start? Check logs:
+docker compose logs openclaw-gateway
 
-# View logs
-tail -50 ~/openclaw.log
+# Need to start fresh?
+docker compose down -v
+docker compose up -d
 
-# Stop
-openclaw stop
+# Is Docker even running?
+docker info
 
-# Restart
-openclaw stop && nohup openclaw start > ~/openclaw.log 2>&1 &
+# Run OpenClaw diagnostics
+docker compose run --rm openclaw-cli openclaw doctor
 ```
 
-## Your Info (Fill In)
+## File Locations
 
-- Server IP: ____________________
-- Claude API key: sk-ant-_______________  (keep secret!)
-- Telegram bot username: @_______________
-- Telegram bot token: ___________________  (keep secret!)
+- **Project folder:** `~/openclaw-local/`
+- **Compose file:** `~/openclaw-local/docker-compose.yml`
+- **Config inside container:** `/home/node/.openclaw/openclaw.json`
+- **Data volume:** Managed by Docker (persistent across restarts)

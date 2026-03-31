@@ -1,0 +1,38 @@
+# OpenClaw Docker Compose -- Module 3
+# Get OpenClaw running locally with the two-service pattern.
+#
+# Your task: fill in the TODOs to create a working compose file.
+
+services:
+  openclaw-gateway:
+    # TODO: Set the image to OpenClaw's official Docker image
+    # Hint: ghcr.io/openclaw/openclaw:latest
+    image:
+    container_name: openclaw-gateway
+    # TODO: Set the restart policy so Docker restarts the container
+    # if it crashes (hint: unless-stopped)
+    restart:
+    ports:
+      # TODO: Expose the gateway port
+      # Hint: OpenClaw gateway runs on port 18789
+      - ""
+    volumes:
+      # TODO: Mount a named volume to /home/node/.openclaw
+      # This is where OpenClaw stores config, conversations, and its database.
+      # Without this, you'd lose everything when the container restarts!
+      -
+
+  openclaw-cli:
+    # TODO: Same image as the gateway
+    image:
+    container_name: openclaw-cli
+    volumes:
+      # TODO: Same volume mount as the gateway (shared data!)
+      -
+    # The profiles trick: this service only runs when explicitly invoked
+    # via `docker compose run --rm openclaw-cli ...`
+    profiles:
+      - cli
+
+volumes:
+  # TODO: Declare the named volume for OpenClaw's data

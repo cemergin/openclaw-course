@@ -1,0 +1,45 @@
+# Docker Compose Challenge Solution -- Module 2
+# A three-service stack: nginx + whoami + httpbin
+#
+# This demonstrates the core patterns you'll use throughout the course:
+# - Multiple services in one file
+# - Shared network for service discovery
+# - Named volumes for persistent data
+# - 127.0.0.1 port binding for security
+
+services:
+  web:
+    image: nginx:latest
+    container_name: challenge-web
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+      - nginx-cache:/var/cache/nginx
+    networks:
+      - playground
+
+  whoami:
+    image: traefik/whoami:latest
+    container_name: challenge-whoami
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:80"
+    networks:
+      - playground
+
+  httpbin:
+    image: kennethreitz/httpbin
+    container_name: challenge-httpbin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8082:80"
+    networks:
+      - playground
+
+networks:
+  playground:
+
+volumes:
+  nginx-cache:

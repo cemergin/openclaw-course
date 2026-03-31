@@ -1,0 +1,48 @@
+# OpenClaw Docker Compose -- Module 3 Solution
+# Two-service pattern: gateway (always running) + CLI (on-demand)
+#
+# Usage:
+#   docker compose up -d                              # Start the gateway
+#   docker compose run --rm openclaw-cli openclaw onboard   # Run onboarding
+#   docker compose run --rm openclaw-cli openclaw channels add telegram  # Add Telegram
+#   docker compose restart openclaw-gateway           # Restart gateway
+#   docker compose run --rm openclaw-cli openclaw gateway status  # Check status
+#   docker compose run --rm openclaw-cli openclaw doctor          # Run diagnostics
+#
+# The gateway exposes port 18789 for the web UI and API.
+# Telegram uses long polling (outbound only) -- no inbound ports needed for chat.
+
+services:
+  openclaw-gateway:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-gateway
+    # Restart automatically on crash or reboot.
+    # Only stays stopped if you explicitly run `docker compose stop`.
+    restart: unless-stopped
+    ports:
+      - "18789:18789"
+    volumes:
+      # Named volume for all of OpenClaw's persistent data:
+      # - Config: /home/node/.openclaw/openclaw.json (JSON5)
+      # - Workspace: /home/node/.openclaw/workspace/ (SOUL.md, skills/, memory/)
+      # - Database: SQLite for conversation history and search
+      #
+      # Container runs as node user (uid 1000).
+      # This is the most important line in the file. Without it,
+      # every `docker compose down && up` would wipe your config.
+      - openclaw-data:/home/node/.openclaw
+
+  openclaw-cli:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-cli
+    volumes:
+      # Same volume as the gateway -- shared config and data
+      - openclaw-data:/home/node/.openclaw
+    # profiles: ["cli"] means this service does NOT start with `docker compose up`.
+    # It only runs when you explicitly invoke it:
+    #   docker compose run --rm openclaw-cli openclaw <command>
+    profiles:
+      - cli
+
+volumes:
+  openclaw-data:

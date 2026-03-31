@@ -141,7 +141,7 @@ You now have:
 - [x] An understanding of how API billing works and what things cost
 - [x] Knowledge of where to revoke keys in an emergency
 
-These keys are the "brain connection" for your AI agent. In the upcoming modules, we'll store them properly on your server using Docker secrets (not just pasting them into config files -- that's how keys get leaked).
+These keys are the "brain connection" for your AI agent. In Module 7, we'll store them properly on your server using Docker Secrets (not just pasting them into config files -- that's how keys get leaked).
 
 ---
 
